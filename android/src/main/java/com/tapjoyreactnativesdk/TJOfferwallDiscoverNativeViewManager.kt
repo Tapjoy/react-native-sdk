@@ -33,7 +33,7 @@ class TJOfferwallDiscoverNativeViewManager(
     override fun receiveCommand(view: TJOfferwallDiscoverNativeView, commandId: String, args: ReadableArray?) {
         super.receiveCommand(view, commandId, args)
         if (commandId == Command.REQUEST_CONTENT.getValue()) {
-            view.requestContent(args!!.getString(0))
+            view.requestContent(args!!.getString(0) ?: " ")
         } else if (commandId == Command.CLEAR_CONTENT.getValue()) {
             view.clearContent()
         }

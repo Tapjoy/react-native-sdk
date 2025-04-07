@@ -64,6 +64,7 @@ const UserProperties: React.FC = () => {
       retrieveUserId().then();
       retrieveUserLevel().then();
       retrieveMaxLevel().then();
+      retrieveOptOut().then();
     }
   }, [isFocused]);
 
@@ -117,6 +118,16 @@ const UserProperties: React.FC = () => {
     }
   };
 
+  const retrieveOptOut = async () => {
+    try {
+      let privacyPolicy = new TJPrivacyPolicy();
+      const optOutStatus = await privacyPolicy.getOptOutAdvertisingID();
+      setOptOut(optOutStatus);
+    } catch (error) {
+      setStatusLabelText(`Error fetching opt-out status:, ${error}`);
+    }
+  };
+
   const findStatus = (value: TJStatus) => {
     return (
       statusData.find((item) => item.value === value) || {
@@ -141,8 +152,9 @@ const UserProperties: React.FC = () => {
         value: false,
         label: 'False',
       }
-    );
+    )
   };
+
 
   const initialUserConsentItem = findStatus(userConsent);
   const initialBelowConsentAgeItem = findStatus(isBelowConsentAge);

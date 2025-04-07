@@ -67,6 +67,15 @@ class TJPrivacyPolicy {
       console.warn('optOutAdvertisingID is only supported on Android.');
     }
   }
+
+  getOptOutAdvertisingID(): Promise<boolean> {
+    if (Platform.OS === 'android') {
+      return Tapjoy.getOptOutAdvertisingID();
+    } else {
+      console.warn('getOptOutAdvertisingID is only supported on Android.');
+      return Promise.resolve(false);
+    }
+  }
 }
 
 export default TJPrivacyPolicy;

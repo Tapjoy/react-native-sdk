@@ -67,13 +67,15 @@ const styles = StyleSheet.create({
   },
   textInput: {
     flex: 1,
-    height: 40,
+    height: 36,
     borderWidth: 1,
     borderColor: 'gray',
     borderRadius: 10,
     paddingLeft: 10,
     paddingRight: 10,
     color: 'black',
+    fontWeight: 'regular',
+    fontSize: 12,
   },
   textInputLabel: {
     width: 50,
@@ -91,6 +93,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     justifyContent: 'center',
     textAlign: 'left',
+    marginBottom: 6
   },
   currencyOuterContainer: {
     flex: 1,
@@ -100,7 +103,6 @@ const styles = StyleSheet.create({
   currencyInnerContainer: {
     flex: 1,
     flexDirection: 'row',
-    marginTop: 10,
   },
   currencyButtonContainer: {
     flex: 1,
@@ -143,7 +145,13 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   userPropertiesLabel: {
-    width: 130,
+    width: 80,
+    paddingRight: 8,
+    color: 'black',
+    fontSize: 12,
+  },
+  purchaseCurrencyLabel: {
+    width: 100,
     paddingRight: 14,
     paddingLeft: 10,
     color: 'black',
@@ -203,7 +211,7 @@ export const pickerSelectStyles = StyleSheet.create({
     height: 40,
   },
   inputIOS: {
-    fontSize: 14,
+    fontSize: 12,
     paddingVertical: 12,
     paddingHorizontal: 10,
     borderColor: 'gray',
@@ -214,7 +222,7 @@ export const pickerSelectStyles = StyleSheet.create({
   },
   inputAndroid: {
     height: 40,
-    fontSize: 16,
+    fontSize: 12,
     paddingHorizontal: 10,
     paddingVertical: 8,
     borderWidth: 1,

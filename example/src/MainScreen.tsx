@@ -6,8 +6,6 @@ import {
   Platform,
   Text,
   ScrollView,
-  NativeEventEmitter,
-  NativeModules,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
@@ -16,20 +14,15 @@ import {
 } from 'react-native-tracking-transparency';
 import styles from './Styles';
 import Button from './Button';
-import Tapjoy, { TJVersion, TJConnect } from 'tapjoy-react-native-sdk';
+import Tapjoy, { TJVersion, TapjoyEvent } from 'tapjoy-react-native-sdk';
 import { ConnectContext } from './ConnectContext';
 
 const MainScreen: React.FC = () => {
   const [sdkKey, setSdkKey] = useState<string>('');
   const [isConnecting, setIsConnecting] = useState<boolean>(false);
+  const [curerncySpendAwardAmount, setCurrencySpendAwardAmount] = useState<string>('10');
   const [statusLabelText, setStatusLabelText] = useState('Status Message');
   const { isSdkConnected, setIsSdkConnected } = useContext(ConnectContext);
-
-  interface TapjoyEvent {
-    name: string;
-    code: string;
-    message: string;
-  }
 
   useEffect(() => {
     retrieveSdkKey().then();
@@ -65,21 +58,11 @@ const MainScreen: React.FC = () => {
       if (trackingStatus !== 'authorized' && trackingStatus !== 'unavailable') {
         await requestTrackingPermission();
       }
-      const TJ = NativeModules.TapjoyReactNativeSdk;
-      const TapjoyEmitter = new NativeEventEmitter(TJ);
-      const TapjoyEventType = 'Tapjoy';
-      const subscription = TapjoyEmitter.addListener(
-        TapjoyEventType,
-        (event: TapjoyEvent) => {
-          if (event.name === TJConnect.TJC_CONNECT_WARNING) {
-            subscription.remove();
-            setStatusLabelText(
-              `Tapjoy SDK connected with Warning: ErrorCode: ${event.code} ${event.message} `
-            );
-          }
-        }
+
+      await Tapjoy.connect(sdkKey, flags, (event: TapjoyEvent) => {
+          setStatusLabelText(`Tapjoy SDK connected with Warning: ErrorCode: ${event.code} ${event.message} `);
+        },
       );
-      await Tapjoy.connect(sdkKey, flags);
       setIsConnecting(false);
       setStatusLabelText(
         'Tapjoy SDK Connected' +
@@ -94,6 +77,14 @@ const MainScreen: React.FC = () => {
       );
       setIsConnecting(false);
     }
+  };
+
+  const parseAmount = (amount: string): number => {
+    const parsedAmount = parseInt(amount);
+    if (isNaN(parsedAmount)) {
+      throw new Error('Invalid amount');
+    }
+    return parsedAmount;
   };
 
   const getCurrencyBalance = async () => {
@@ -112,26 +103,31 @@ const MainScreen: React.FC = () => {
 
   const spendCurrency = async () => {
     try {
-      let amount = 10.0;
+      const amount = parseAmount(curerncySpendAwardAmount);
       let result = await Tapjoy.spendCurrency(amount);
       setStatusLabelText(
         'spendCurrency returned ' + result.currencyName + ': ' + result.amount
       );
     } catch (error: any) {
-      setStatusLabelText(error.toString());
+      setStatusLabelText('spendCurrency error: ' + error.toString());
     }
   };
 
   const awardCurrency = async () => {
     try {
-      let amount = 10.0;
+      const amount = parseAmount(curerncySpendAwardAmount);
       let result = await Tapjoy.awardCurrency(amount);
       setStatusLabelText(
         'awardCurrency returned ' + result.currencyName + ': ' + result.amount
       );
     } catch (error: any) {
-      setStatusLabelText(error.toString());
+      setStatusLabelText('awardCurrency error: ' + error.toString());
     }
+  };
+
+  const handleAmountChange = (text: string) => {
+    const numericText = text.replace(/[^0-9]/g, '');
+    setCurrencySpendAwardAmount(numericText);
   };
 
   return (
@@ -157,6 +153,16 @@ const MainScreen: React.FC = () => {
           </View>
           <View style={styles.currencyOuterContainer}>
             <Text style={styles.labelText}>{'Managed Currency:'}</Text>
+            <View style={styles.inputContainer}>
+              <Text style={styles.userPropertiesLabel}>Amount:</Text>
+              <TextInput
+                style={styles.textInput}
+                keyboardType='numeric'
+                value={curerncySpendAwardAmount}
+                onChangeText={handleAmountChange}
+                placeholder="Managed Currency value"
+              />
+            </View>
             <View style={styles.currencyInnerContainer}>
               <Button
                 style={styles.buttonGap}

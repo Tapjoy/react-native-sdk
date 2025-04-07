@@ -20,9 +20,31 @@ class TJPlacement extends EventEmitter {
   static readonly CONTENT_DID_APPEAR = 'contentDidAppear';
   static readonly CONTENT_DID_DISAPPEAR = 'contentDidDisappear';
 
+  /**
+   * Returns the name of this placement. This is the same name passed to the
+   * constructor when creating this {@link TJPlacement} object.
+   */
   public name: string;
+
+  /**
+   * Returns a description of the error, if any, that was encountered when processing 
+   * the placement request. If the request completes successfully, this property remains 
+   * undefined. You can use this property to determine why a placement request failed by 
+   * listening to the {@link TJPlacement.REQUEST_DID_FAIL} event.
+   */
   public error: string | undefined;
 
+  /**
+   * Creates a new instance of a Tapjoy placement. Each placement is defined on the Tapjoy dashboard and can be configured
+   * to serve different content to your users.
+   *
+   * @param name - The unique identifier for this placement. It is used to register and
+   * retrieve the placement from Tapjoy.
+   *
+   * @example
+   * const placement = new TJPlacement('MainMenuPlacement');
+   *
+   */
   public constructor(name: string) {
     super();
     this.name = name;
@@ -99,7 +121,7 @@ class TJPlacement extends EventEmitter {
    * Sets the currency balance for given currency id.
    *
    * @param {String} currencyId - The identifier of the currency.
-   * @param {Number} currencyBalance - The amount of the currency to set.
+   * @param {Number} currencyBalance - The amount of the currency to set. Must be greater than or equal to 0.
    */
   async setCurrencyBalance(
     currencyId: String,
@@ -139,7 +161,7 @@ class TJPlacement extends EventEmitter {
   }
 
   /**
-   * Sets entry point.
+   * Sets the entry point for this placement instance.
    *
    * @param {TJEntryPoint} entryPoint - Entry point.
    * @see TJEntryPoint
@@ -149,7 +171,7 @@ class TJPlacement extends EventEmitter {
   }
 
   /**
-   * Gets entry point.
+   * Gets the entry point for this placement instance.
    *
    * @returns Entry point.
    * @see TJEntryPoint

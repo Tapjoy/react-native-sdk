@@ -29,7 +29,7 @@ export default class TJOfferwallDiscoverView extends React.Component<TJOfferwall
     super(props);
   }
 
-  render() {
+  override render () {
     return (
       <TJOfferwallDiscoverNativeView
         {...this.props}
@@ -51,7 +51,8 @@ export default class TJOfferwallDiscoverView extends React.Component<TJOfferwall
   clearContent() {
     UIManager.dispatchViewManagerCommand(
       this.nativeCompHandle!!,
-      Command.CLEAR_CONTENT
+      Command.CLEAR_CONTENT,
+      []
     );
   }
 }

@@ -6,16 +6,5 @@ import TJSegment from './TJSegment';
 import TJOfferwallDiscoverView from './TJOfferwallDiscoverView';
 import TJPurchase from './TJPurchase';
 import Tapjoy from './Tapjoy';
-
-
-export {
-  Tapjoy,
-  TJPlacement,
-  TJPrivacyPolicy,
-  TJVersion,
-  TJStatus,
-  TJSegment,
-  TJOfferwallDiscoverView,
-  TJPurchase,
-};
+export { Tapjoy, TJPlacement, TJPrivacyPolicy, TJVersion, TJStatus, TJSegment, TJOfferwallDiscoverView, TJPurchase, };
 export default Tapjoy;

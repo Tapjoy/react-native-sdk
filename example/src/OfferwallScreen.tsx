@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
 import {
   FlatList,
   SafeAreaView,
@@ -12,7 +11,7 @@ import dayjs from 'dayjs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Button from './Button';
 import styles, { pickerSelectStyles } from './Styles';
-import Tapjoy, { TJPlacement, TJPurchase } from 'tapjoy-react-native-sdk';
+import {TJPlacement, TJPurchase } from 'tapjoy-react-native-sdk';
 import RNPickerSelect from 'react-native-picker-select';
 import TJEntryPoint from '../../src/TJEntryPoint';
 import { ConnectContext } from './ConnectContext';
@@ -30,6 +29,8 @@ const OfferwallScreen: React.FC = () => {
   const [currencyId, _setCurrencyId] = useState<string>('');
   const [currencyBalance, _setCurrencyBalance] = useState<string>('');
   const [requiredAmount, _setRequiredAmount] = useState<string>('');
+  const [purchaseAmount, _setPurchaseAmount] = useState<string>('0.99');
+  const [purchaseCode, _setPurchaseCode] = useState<string>('USD');
   const { isSdkConnected, setIsSdkConnected } = useContext(ConnectContext);
 
   useEffect(() => {
@@ -47,6 +48,14 @@ const OfferwallScreen: React.FC = () => {
   useEffect(() => {
     retrieveRequiredAmount().then();
   });
+
+  useEffect(() => {
+    retrievePurchaseCurrency().then();
+  });
+
+  useEffect(() => {
+    retrievePurchaseCode().then();
+  }); 
 
   const retrieveStoredPlacementName = () => {
     AsyncStorage.getItem('placementName').then(async (value) => {
@@ -89,6 +98,28 @@ const OfferwallScreen: React.FC = () => {
     }
   };
 
+  const retrievePurchaseCurrency = async () => {
+    try {
+      const value = await AsyncStorage.getItem('purchaseAmount');
+      if (value !== null) {
+        await setPurchaseAmount(value);
+      }
+    } catch (error) {
+      addLogItem(`Failed to retrieve purchase amount: ${error}`);
+  }
+};
+
+const retrievePurchaseCode = async () => {
+  try {
+    const value = await AsyncStorage.getItem('purchaseCode');
+    if (value !== null) {
+      await setPurchaseCode(value);
+    }
+  } catch (error) {
+    addLogItem(`Failed to retrieve purchase amount: ${error}`);
+}
+};
+
   const setCurrencyId = async (id: string) => {
     _setCurrencyId(id);
     let trimmedCurrencyId = id.trim();
@@ -105,6 +136,18 @@ const OfferwallScreen: React.FC = () => {
     _setRequiredAmount(newValue);
     let trimmedValue = newValue.trim();
     await AsyncStorage.setItem('requiredAmount', trimmedValue);
+  };
+
+  const setPurchaseAmount = async (newValue: string) => {
+    _setPurchaseAmount(newValue);
+    let trimmedValue = newValue.trim();
+    await AsyncStorage.setItem('purchaseAmount', trimmedValue);
+  };
+
+  const setPurchaseCode = async (newValue: string) => {
+    _setPurchaseCode(newValue);
+    let trimmedValue = newValue.trim();
+    await AsyncStorage.setItem('purchaseCode', trimmedValue);
   };
 
   const handleClearCurrencyId = async () => {
@@ -201,8 +244,8 @@ const OfferwallScreen: React.FC = () => {
 
   const sendPurchaseAction = () => {
     const offerwallPurchase = new TJPurchase();
-    let currency = 'USD';
-    let price = 0.99;
+    let currency = purchaseCode;
+    let price = Number(purchaseAmount);
     offerwallPurchase.trackPurchase(currency, price);
     addLogItem(`Track Purchase Event - Currency: ${currency} Price: ${price}`);
   };
@@ -355,6 +398,26 @@ const OfferwallScreen: React.FC = () => {
               style={styles.clearButton}
               onPress={handleClearRequiredAmount}
               title={'\u2573'}
+            />
+          </View>
+          <View style={styles.inputContainer}>
+            <Text style={styles.purchaseCurrencyLabel}>Purchase Amount:</Text>
+            <TextInput
+              style={styles.textInput}
+              value={purchaseAmount}
+              keyboardType={'numeric'}
+              onChangeText={setPurchaseAmount}
+              placeholder="E.g. 0.99"
+              placeholderTextColor="#888"
+            />
+            <Text style={styles.purchaseCurrencyLabel}>Purchase Code:</Text>
+            <TextInput
+              style={styles.textInput}
+              value={purchaseCode}
+              keyboardType={'default'}
+              onChangeText={setPurchaseCode}
+              placeholder="E.g. USD."
+              placeholderTextColor="#888"
             />
           </View>
           <View style={styles.buttonContainer}>

@@ -233,12 +233,10 @@ class TapjoyReactNativeSdk: RCTEventEmitter {
      Create content for a given placement.
      - Parameter name: Case-sensitive placement name string. Must not be empty or null.
      */
-    @objc func createPlacement(_ name: String) -> TJPlacement? {
+    @objc func createPlacement(_ name: String) {
         if let placement = TJPlacement(name: name, delegate: self) {
            placements[name] = placement
-           return placement
         }
-        return nil
     }
 
     /**

@@ -201,13 +201,24 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
     promise.resolve(segment?.getValue() ?: TJSegment.UNKNOWN.getValue())
   }
 
-  /** Sets the maximum level of the user.
+  /** 
+   * Sets the maximum level of the user.
    *
    * @Param maxLevel: the maximum level
    */
   @ReactMethod
   fun setMaxLevel(maxLevel: Int) {
     Tapjoy.setMaxLevel(maxLevel);
+  }
+
+  /** 
+   * Gets the maximum level of the user.
+   *
+   * @return the maximum level
+   */
+  @ReactMethod
+  fun getMaxLevel(promise: Promise) {
+    promise.resolve(Tapjoy.getMaxLevel())
   }
 
   /**
@@ -636,6 +647,16 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
   @ReactMethod
   fun optOutAdvertisingID(optOut: Boolean) {
     Tapjoy.optOutAdvertisingID(this.currentActivity?.applicationContext, optOut)
+  }
+
+  @ReactMethod
+  fun getOptOutAdvertisingID(promise: Promise) {
+    val optOutStatus = Tapjoy.getOptOutAdvertisingID(this.currentActivity?.applicationContext)
+    if (optOutStatus != null) {
+      promise.resolve(optOutStatus)
+    } else {
+      promise.reject("Get Opt Out ID Error", Exception("error"))
+    }
   }
 
   private fun ReadableMap.toHashtable(): Hashtable<String, Any> {
