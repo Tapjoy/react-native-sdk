@@ -18,6 +18,7 @@ import com.tapjoy.TJPrivacyPolicy;
 import com.tapjoy.TJSegment;
 import com.tapjoy.TapjoyPluginAPI;
 import com.tapjoy.TJEntryPoint
+import com.tapjoy.TJLogLevel
 import java.util.Hashtable
 import kotlin.collections.HashMap
 import com.facebook.react.modules.core.DeviceEventManagerModule
@@ -190,6 +191,25 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
   }
 
   /**
+   * Assign a custom parameter associated with any following placement requests that contains an ad type. We will return this value on the currency callback.
+   * Only applicable for publishers who manage their own currency servers. This value does NOT get unset with each subsequent placement request.
+   * @param customParameter
+   * 		      The custom parameter to assign to this device
+   */
+  @ReactMethod
+  fun setCustomParameter(customParameter: String) {
+    Tapjoy.setCustomParameter(customParameter)
+  }
+
+  /**
+   * Returns the currently set custom parameter.
+   * @return the value of the currently set custom parameter.
+   */
+  @ReactMethod
+  fun getCustomParameter(promise: Promise) {
+    promise.resolve(Tapjoy.getCustomParameter())
+  }
+  /**
    * Sets the segment of the user
    *
    * @return userSegment NON_PAYER (0), PAYER (1), VIP (2)
@@ -302,6 +322,25 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
     Tapjoy.removeUserTag(tag)
   }
 
+  @ReactMethod
+  fun setLoggingLevel(level: Int) {
+    when (level) {
+      0 -> Tapjoy.setLoggingLevel(TJLogLevel.ERROR)
+      1 -> Tapjoy.setLoggingLevel(TJLogLevel.WARNING)
+      2 -> Tapjoy.setLoggingLevel(TJLogLevel.INFO)
+      3 -> Tapjoy.setLoggingLevel(TJLogLevel.DEBUG)
+    }
+  }
+
+  @ReactMethod
+  fun getLoggingLevel(promise: Promise) {
+    when (Tapjoy.getLoggingLevel()) {
+      TJLogLevel.ERROR -> promise.resolve(0)
+      TJLogLevel.WARNING -> promise.resolve(1)
+      TJLogLevel.INFO -> promise.resolve(2)
+      TJLogLevel.DEBUG -> promise.resolve(3)
+    }
+  }
 
   @ReactMethod
   fun setDebugEnabled(enabled: Boolean) {

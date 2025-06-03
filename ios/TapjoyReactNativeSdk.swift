@@ -93,12 +93,12 @@ class TapjoyReactNativeSdk: RCTEventEmitter {
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(TJC_CONNECT_FAILED), object: nil)
     }    
     
-    /**
-     Enables debug log
-     - Parameter enabled: true for enabling and false for disabling
-    */
-    @objc func setDebugEnabled(_ enabled: Bool) {
-        Tapjoy.setDebugEnabled(enabled)
+    @objc func setLoggingLevel(_ loggingLevel: NSNumber) {
+        Tapjoy.loggingLevel = TJLoggerLevel(rawValue: loggingLevel.intValue) ?? .error
+    }
+
+    @objc func getLoggingLevel(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+        resolve(Tapjoy.loggingLevel.rawValue)
     }
     
     @objc func isConnected() -> NSNumber {
@@ -117,6 +117,14 @@ class TapjoyReactNativeSdk: RCTEventEmitter {
 
     @objc func getUserId(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
         resolve(Tapjoy.getUserID())
+    }
+
+    @objc func setCustomParameter(_ customParameter: String) {
+        Tapjoy.sharedTapjoyConnect().customParameter = customParameter
+    }
+
+    @objc func getCustomParameter(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+        resolve(Tapjoy.sharedTapjoyConnect().customParameter)
     }
 
     /**

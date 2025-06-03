@@ -1,6 +1,8 @@
 import { NativeModules, Platform, NativeEventEmitter } from 'react-native';
 import TJSegment from './TJSegment';
 import TJConnect from './TJConnect';
+import TJLoggingLevel from './TJLoggingLevel';
+import { TapjoyEvent } from './TapjoyEvent';
 
 const LINKING_ERROR =
 `The package 'tapjoy-react-native-sdk' doesn't seem to be linked. Make sure: \n\n` +
@@ -99,15 +101,38 @@ class Tapjoy {
     TapjoyAPI.trackPurchase(currencyCode, price);
   }
 
+  /**
+   * Sets the logging level for Tapjoy.
+   *
+   * @param loggingLevel
+   *           the logging level to set
+   * @see TJLoggingLevel
+   */
+  public static setLoggingLevel(loggingLevel: TJLoggingLevel) {
+    TapjoyAPI.setLoggingLevel(loggingLevel);
+  };
+
+  /**
+   * Gets the current logging level for Tapjoy.
+   *
+   * @return the current logging level
+   * @see TJLoggingLevel
+   */
+  public static async getLoggingLevel() {
+    return await TapjoyAPI.getLoggingLevel();
+  };
+
 	/**
+   * @deprecated Deprecated in 14.4.0 in favor of setLoggingLevel
+   *
 	 * Enables or disables Tapjoy logging
-	 * 
+	 *
 	 * @param enable
 	 *            set to true if logging should be enabled, false to disable
 	 *            logging
 	 */
   public static setDebugEnabled(enable: Boolean) {
-    TapjoyAPI.setDebugEnabled(enable);
+    TapjoyAPI.setLoggingLevel(enable ? TJLoggingLevel.Debug : TJLoggingLevel.Error);
   };
 
   /**
@@ -235,6 +260,24 @@ class Tapjoy {
 	 */
   public static removeUserTag(tag: string) {
     TapjoyAPI.removeUserTag(tag);
+  }
+
+  /**
+	* Assign a custom parameter associated with any following placement requests that contains an ad type. We will return this value on the currency callback.
+	* Only applicable for publishers who manage their own currency servers. This value does NOT get unset with each subsequent placement request.
+	* @param customParameter
+	* 		      The custom parameter to assign to this device
+	*/
+  public static setCustomParameter(customParameter: string) {
+    TapjoyAPI.setCustomParameter(customParameter);
+  }
+
+  /**
+	* Returns the currently set custom parameter.
+	* @return the value of the currently set custom parameter.
+	*/
+  public static async getCustomParameter() {
+    return TapjoyAPI.getCustomParameter();
   }
 }
 export default Tapjoy;

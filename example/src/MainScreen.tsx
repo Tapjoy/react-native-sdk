@@ -14,8 +14,9 @@ import {
 } from 'react-native-tracking-transparency';
 import styles from './Styles';
 import Button from './Button';
-import Tapjoy, { TJVersion, TapjoyEvent } from 'tapjoy-react-native-sdk';
+import Tapjoy, { TJVersion, TapjoyEvent, TJLoggingLevel } from 'tapjoy-react-native-sdk';
 import { ConnectContext } from './ConnectContext';
+import SelectionMenu from './SelectionMenu';
 
 const MainScreen: React.FC = () => {
   const [sdkKey, setSdkKey] = useState<string>('');
@@ -23,7 +24,15 @@ const MainScreen: React.FC = () => {
   const [curerncySpendAwardAmount, setCurrencySpendAwardAmount] = useState<string>('10');
   const [statusLabelText, setStatusLabelText] = useState('Status Message');
   const { isSdkConnected, setIsSdkConnected } = useContext(ConnectContext);
-
+  const [selectedLoggingLevel, setSelectedLoggingLevel] = useState<TJLoggingLevel>(
+    TJLoggingLevel.Error
+  );
+  const loggingLevelData = [
+    { value: TJLoggingLevel.Error, label: 'Error' },
+    { value: TJLoggingLevel.Warning, label: 'Warning' },
+    { value: TJLoggingLevel.Info, label: 'Info' },
+    { value: TJLoggingLevel.Debug, label: 'Debug' },
+  ];
   useEffect(() => {
     retrieveSdkKey().then();
   }, []);
@@ -50,9 +59,13 @@ const MainScreen: React.FC = () => {
       setIsConnecting(true);
       await AsyncStorage.setItem('sdkKey', sdkKey);
 
-      Tapjoy.setDebugEnabled(true);
-      // Use the following line to set the user id
-      // let flags: object = { TJC_OPTION_USER_ID: userId };
+      Tapjoy.setLoggingLevel(selectedLoggingLevel);
+
+      // Use the following code to set the user id and logging level using connect flags
+      // let flags: object = {
+      //                       TJC_OPTION_USER_ID: "userId",
+      //                       TJC_OPTION_LOGGING_LEVEL: TJLoggingLevel.Debug
+      // };
       let flags: object = {};
       let trackingStatus = await getTrackingStatus();
       if (trackingStatus !== 'authorized' && trackingStatus !== 'unavailable') {
@@ -64,6 +77,8 @@ const MainScreen: React.FC = () => {
         },
       );
       setIsConnecting(false);
+      setSelectedLoggingLevel(await Tapjoy.getLoggingLevel());
+      Tapjoy.setCustomParameter("my_parameter");
       setStatusLabelText(
         'Tapjoy SDK Connected' +
           (Object.keys(flags).length > 0
@@ -130,6 +145,15 @@ const MainScreen: React.FC = () => {
     setCurrencySpendAwardAmount(numericText);
   };
 
+  const handleLoggingLevelChange = async (item: { value: TJLoggingLevel }) => {
+    setSelectedLoggingLevel(item.value);
+    const originalLoggingLevel = await Tapjoy.getLoggingLevel();
+    await Tapjoy.setLoggingLevel(item.value);
+    if (await Tapjoy.getLoggingLevel() !== item.value) {
+      setSelectedLoggingLevel(originalLoggingLevel); // Revert to the original value if logging level is locked
+    }
+  };
+
   return (
     <View style={styles.mainContainer}>
       <ScrollView>
@@ -175,6 +199,16 @@ const MainScreen: React.FC = () => {
                 onPress={spendCurrency}
               />
               <Button title="Award" onPress={awardCurrency} />
+            </View>
+            <View style={styles.selectionContainer}>
+              <View style={styles.horizontalContainer}>
+                <Text style={styles.userPropertiesLabel}>Logging Level:</Text>
+                <SelectionMenu
+                  data={loggingLevelData}
+                  onSelectItem={handleLoggingLevelChange}
+                  initialSelectedItem={loggingLevelData[selectedLoggingLevel]}
+                />
+              </View>
             </View>
           </View>
         </SafeAreaView>

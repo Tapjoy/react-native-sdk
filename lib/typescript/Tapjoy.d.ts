@@ -1,4 +1,6 @@
 import TJSegment from './TJSegment';
+import TJLoggingLevel from './TJLoggingLevel';
+import { TapjoyEvent } from './TapjoyEvent';
 declare class Tapjoy {
     /**
      * Connects to the Tapjoy Server.
@@ -49,6 +51,23 @@ declare class Tapjoy {
        */
     static trackPurchase(currencyCode: string, price: number): void;
     /**
+     * Sets the logging level for Tapjoy.
+     *
+     * @param loggingLevel
+     *           the logging level to set
+     * @see TJLoggingLevel
+     */
+    static setLoggingLevel(loggingLevel: TJLoggingLevel): void;
+    /**
+     * Gets the current logging level for Tapjoy.
+     *
+     * @return the current logging level
+     * @see TJLoggingLevel
+     */
+    static getLoggingLevel(): Promise<any>;
+    /**
+   * @deprecated Deprecated in 14.4.0 in favor of setLoggingLevel
+   *
      * Enables or disables Tapjoy logging
      *
      * @param enable
@@ -144,5 +163,17 @@ declare class Tapjoy {
        *        the tag to be removed
        */
     static removeUserTag(tag: string): void;
+    /**
+      * Assign a custom parameter associated with any following placement requests that contains an ad type. We will return this value on the currency callback.
+      * Only applicable for publishers who manage their own currency servers. This value does NOT get unset with each subsequent placement request.
+      * @param customParameter
+      * 		      The custom parameter to assign to this device
+      */
+    static setCustomParameter(customParameter: string): void;
+    /**
+      * Returns the currently set custom parameter.
+      * @return the value of the currently set custom parameter.
+      */
+    static getCustomParameter(): Promise<any>;
 }
 export default Tapjoy;

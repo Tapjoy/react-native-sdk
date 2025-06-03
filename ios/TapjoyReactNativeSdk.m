@@ -5,8 +5,11 @@
 
 #pragma mark - SDK
 RCT_EXTERN_METHOD(connect:(NSString *)sdkKey connectFlags:(NSDictionary *)connectFlags resolve:(RCTPromiseResolveBlock *)resolve reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(setDebugEnabled:(BOOL)enabled)
+RCT_EXTERN_METHOD(setLoggingLevel:(NSNumber *)loggingLevel)
+RCT_EXTERN_METHOD(getLoggingLevel:(RCTPromiseResolveBlock *)resolve reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN__BLOCKING_SYNCHRONOUS_METHOD(isConnected)
+RCT_EXTERN_METHOD(setCustomParameter:(NSString *)customParameter)
+RCT_EXTERN_METHOD(getCustomParameter:(RCTPromiseResolveBlock *)resolve reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(setUserId:(NSString *)userId resolve:(RCTPromiseResolveBlock *)resolve reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(getUserId:(RCTPromiseResolveBlock *)resolve reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(setUserSegment:(nonnull NSNumber *)userSegment)
