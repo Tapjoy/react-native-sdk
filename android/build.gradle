@@ -69,7 +69,7 @@ repositories {
   google()
   maven {
     name "Tapjoy's maven repo"
-    url "https://sdk.tapjoy.com"
+    url "https://sdk.tapjoy.com/beta"
   }
 }
 
