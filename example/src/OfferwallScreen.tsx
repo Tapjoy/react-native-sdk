@@ -1,17 +1,20 @@
 import React, { useEffect, useState, useContext } from 'react';
 import {
   FlatList,
-  SafeAreaView,
   ScrollView,
   Text,
   TextInput,
   View,
 } from 'react-native';
+import {
+  SafeAreaProvider,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 import dayjs from 'dayjs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Button from './Button';
 import styles, { pickerSelectStyles } from './Styles';
-import {TJPlacement, TJPurchase } from 'tapjoy-react-native-sdk';
+import { TJPlacement, TJPurchase } from 'tapjoy-react-native-sdk';
 import RNPickerSelect from 'react-native-picker-select';
 import TJEntryPoint from '../../src/TJEntryPoint';
 import { ConnectContext } from './ConnectContext';
@@ -55,7 +58,7 @@ const OfferwallScreen: React.FC = () => {
 
   useEffect(() => {
     retrievePurchaseCode().then();
-  }); 
+  });
 
   const retrieveStoredPlacementName = () => {
     AsyncStorage.getItem('placementName').then(async (value) => {
@@ -106,19 +109,19 @@ const OfferwallScreen: React.FC = () => {
       }
     } catch (error) {
       addLogItem(`Failed to retrieve purchase amount: ${error}`);
-  }
-};
-
-const retrievePurchaseCode = async () => {
-  try {
-    const value = await AsyncStorage.getItem('purchaseCode');
-    if (value !== null) {
-      await setPurchaseCode(value);
     }
-  } catch (error) {
-    addLogItem(`Failed to retrieve purchase amount: ${error}`);
-}
-};
+  };
+
+  const retrievePurchaseCode = async () => {
+    try {
+      const value = await AsyncStorage.getItem('purchaseCode');
+      if (value !== null) {
+        await setPurchaseCode(value);
+      }
+    } catch (error) {
+      addLogItem(`Failed to retrieve purchase amount: ${error}`);
+    }
+  };
 
   const setCurrencyId = async (id: string) => {
     _setCurrencyId(id);
@@ -178,7 +181,7 @@ const retrievePurchaseCode = async () => {
           );
           addLogItem(
             'setCurrencyBalance: ' +
-              (await offerwallPlacement?.getCurrencyBalance(currencyId))
+            (await offerwallPlacement?.getCurrencyBalance(currencyId))
           );
         } catch (e: any) {
           addLogItem(`currencyBalanceError: ${e.code} - ${e.message}`);
@@ -193,9 +196,9 @@ const retrievePurchaseCode = async () => {
           );
           addLogItem(
             'setCurrencyRequiredAmount: ' +
-              JSON.stringify(
-                await offerwallPlacement?.getRequiredAmount(currencyId)
-              )
+            JSON.stringify(
+              await offerwallPlacement?.getRequiredAmount(currencyId)
+            )
           );
         } catch (e: any) {
           addLogItem(`requiredAmountError: ${e.code} - ${e.message}`);
@@ -223,8 +226,7 @@ const retrievePurchaseCode = async () => {
       TJPlacement.REQUEST_DID_FAIL,
       (placement: TJPlacement) => {
         addLogItem(
-          `${TJPlacement.REQUEST_DID_FAIL} "${placement.name}" - ${
-            placement.error !== undefined ? placement.error : ''
+          `${TJPlacement.REQUEST_DID_FAIL} "${placement.name}" - ${placement.error !== undefined ? placement.error : ''
           }`
         );
         setPlacementState('failed');
@@ -302,145 +304,157 @@ const retrievePurchaseCode = async () => {
     { label: 'Store', value: TJEntryPoint.TJEntryPointStore },
   ];
 
+  const safeAreaInsets = useSafeAreaInsets();
+
   return (
-    <View style={styles.mainContainer}>
-      <ScrollView style={styles.offerwallScrollContainer}>
-        <SafeAreaView style={styles.container}>
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.textInput}
-              value={offerwallPlacementName}
-              onChangeText={setOfferwallPlacementName}
-              autoCorrect={false}
-              placeholder="Enter Placement Name"
-              placeholderTextColor="#888"
-              autoCapitalize="none"
-            />
-            <Button
-              style={[styles.clearButton, styles.leftSpacing]}
-              onPress={handleClearInput}
-              title={'\u2573'}
-            />
-          </View>
-          <View style={styles.buttonContainer}>
-            <Button
-              onPress={loadPlacement}
-              disabled={!isSdkConnected}
-              title={'Request'}
-            />
-            <View style={styles.buttonGap} />
-            <Button
-              onPress={showPlacement}
-              disabled={!(placementState === 'ready')}
-              title={'Display'}
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            <Text style={styles.userPropertiesLabel}>Entry Point: </Text>
-            <RNPickerSelect
-              placeholder={{
-                label: 'Select Entry Point...',
-                value: TJEntryPoint.TJEntryPointUnknown,
-              }}
-              onValueChange={async (value: any) => {
-                offerwallPlacement?.setEntryPoint(value);
-                setEntryPoint(value);
-              }}
-              items={entryPointArray}
-              style={pickerSelectStyles}
-              useNativeAndroidPickerStyle={false}
-              touchableWrapperProps={{ style: { flex: 1 } }}
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            <Text style={styles.userPropertiesLabel}>Currency ID:</Text>
-            <TextInput
-              style={styles.textInput}
-              value={currencyId}
-              keyboardType={'default'}
-              onChangeText={setCurrencyId}
-              placeholder="Enter Currency ID."
-              placeholderTextColor="#888"
-            />
-            <Button
-              style={styles.clearButton}
-              onPress={handleClearCurrencyId}
-              title={'\u2573'}
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            <Text style={styles.userPropertiesLabel}>Currency Balance:</Text>
-            <TextInput
-              style={styles.textInput}
-              value={currencyBalance}
-              keyboardType={'numeric'}
-              onChangeText={setCurrencyBalance}
-              placeholder="Enter Currency Balance."
-              placeholderTextColor="#888"
-            />
-            <Button
-              style={styles.clearButton}
-              onPress={handleClearCurrencyBalance}
-              title={'\u2573'}
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            <Text style={styles.userPropertiesLabel}>Required Amount:</Text>
-            <TextInput
-              style={styles.textInput}
-              value={requiredAmount}
-              keyboardType={'numeric'}
-              onChangeText={setRequiredAmount}
-              placeholder="Enter Required Amount."
-              placeholderTextColor="#888"
-            />
-            <Button
-              style={styles.clearButton}
-              onPress={handleClearRequiredAmount}
-              title={'\u2573'}
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            <Text style={styles.purchaseCurrencyLabel}>Purchase Amount:</Text>
-            <TextInput
-              style={styles.textInput}
-              value={purchaseAmount}
-              keyboardType={'numeric'}
-              onChangeText={setPurchaseAmount}
-              placeholder="E.g. 0.99"
-              placeholderTextColor="#888"
-            />
-            <Text style={styles.purchaseCurrencyLabel}>Purchase Code:</Text>
-            <TextInput
-              style={styles.textInput}
-              value={purchaseCode}
-              keyboardType={'default'}
-              onChangeText={setPurchaseCode}
-              placeholder="E.g. USD."
-              placeholderTextColor="#888"
-            />
-          </View>
-          <View style={styles.buttonContainer}>
-          <Button
-              onPress={sendPurchaseAction}
-              disabled={!isSdkConnected}
-              title={'Purchase'}
-            />
-          </View>
-        </SafeAreaView>
-      </ScrollView>
-      <View style={styles.owLogContainer}>
-        <FlatList
-          data={logData}
-          renderItem={({ item }) => (
-            <View>
-              <Text style={styles.logText}>{item}</Text>
+    <SafeAreaProvider>
+      <View style={[
+        styles.mainContainer,
+        {
+          paddingTop: safeAreaInsets.top,
+          paddingBottom: safeAreaInsets.bottom,
+          paddingLeft: safeAreaInsets.left,
+          paddingRight: safeAreaInsets.right,
+        },
+      ]}>
+        <ScrollView style={styles.offerwallScrollContainer}>
+          <View style={styles.container}>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.textInput}
+                value={offerwallPlacementName}
+                onChangeText={setOfferwallPlacementName}
+                autoCorrect={false}
+                placeholder="Enter Placement Name"
+                placeholderTextColor="#888"
+                autoCapitalize="none"
+              />
+              <Button
+                style={[styles.clearButton, styles.leftSpacing]}
+                onPress={handleClearInput}
+                title={'\u2573'}
+              />
             </View>
-          )}
-          keyExtractor={(_item, index) => index.toString()}
-        />
+            <View style={styles.buttonContainer}>
+              <Button
+                onPress={loadPlacement}
+                disabled={!isSdkConnected}
+                title={'Request'}
+              />
+              <View style={styles.buttonGap} />
+              <Button
+                onPress={showPlacement}
+                disabled={!(placementState === 'ready')}
+                title={'Display'}
+              />
+            </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.userPropertiesLabel}>Entry Point: </Text>
+              <RNPickerSelect
+                placeholder={{
+                  label: 'Select Entry Point...',
+                  value: TJEntryPoint.TJEntryPointUnknown,
+                }}
+                onValueChange={async (value: any) => {
+                  offerwallPlacement?.setEntryPoint(value);
+                  setEntryPoint(value);
+                }}
+                items={entryPointArray}
+                style={pickerSelectStyles}
+                useNativeAndroidPickerStyle={false}
+                touchableWrapperProps={{ style: { flex: 1 } }}
+              />
+            </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.userPropertiesLabel}>Currency ID:</Text>
+              <TextInput
+                style={styles.textInput}
+                value={currencyId}
+                keyboardType={'default'}
+                onChangeText={setCurrencyId}
+                placeholder="Enter Currency ID."
+                placeholderTextColor="#888"
+              />
+              <Button
+                style={styles.clearButton}
+                onPress={handleClearCurrencyId}
+                title={'\u2573'}
+              />
+            </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.userPropertiesLabel}>Currency Balance:</Text>
+              <TextInput
+                style={styles.textInput}
+                value={currencyBalance}
+                keyboardType={'numeric'}
+                onChangeText={setCurrencyBalance}
+                placeholder="Enter Currency Balance."
+                placeholderTextColor="#888"
+              />
+              <Button
+                style={styles.clearButton}
+                onPress={handleClearCurrencyBalance}
+                title={'\u2573'}
+              />
+            </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.userPropertiesLabel}>Required Amount:</Text>
+              <TextInput
+                style={styles.textInput}
+                value={requiredAmount}
+                keyboardType={'numeric'}
+                onChangeText={setRequiredAmount}
+                placeholder="Enter Required Amount."
+                placeholderTextColor="#888"
+              />
+              <Button
+                style={styles.clearButton}
+                onPress={handleClearRequiredAmount}
+                title={'\u2573'}
+              />
+            </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.purchaseCurrencyLabel}>Purchase Amount:</Text>
+              <TextInput
+                style={styles.textInput}
+                value={purchaseAmount}
+                keyboardType={'numeric'}
+                onChangeText={setPurchaseAmount}
+                placeholder="E.g. 0.99"
+                placeholderTextColor="#888"
+              />
+              <Text style={styles.purchaseCurrencyLabel}>Purchase Code:</Text>
+              <TextInput
+                style={styles.textInput}
+                value={purchaseCode}
+                keyboardType={'default'}
+                onChangeText={setPurchaseCode}
+                placeholder="E.g. USD."
+                placeholderTextColor="#888"
+              />
+            </View>
+            <View style={styles.buttonContainer}>
+              <Button
+                onPress={sendPurchaseAction}
+                disabled={!isSdkConnected}
+                title={'Purchase'}
+              />
+            </View>
+          </View>
+        </ScrollView>
+        <View style={styles.owLogContainer}>
+          <FlatList
+            data={logData}
+            renderItem={({ item }) => (
+              <View>
+                <Text style={styles.logText}>{item}</Text>
+              </View>
+            )}
+            keyExtractor={(_item, index) => index.toString()}
+          />
+        </View>
       </View>
-    </View>
+    </SafeAreaProvider>
   );
 };
 

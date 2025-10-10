@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useContext } from 'react';
 import {
   View,
-  SafeAreaView,
   TextInput,
   Platform,
   Text,
   ScrollView,
 } from 'react-native';
+import {
+  SafeAreaProvider,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   getTrackingStatus,
@@ -73,17 +76,17 @@ const MainScreen: React.FC = () => {
       }
 
       await Tapjoy.connect(sdkKey, flags, (event: TapjoyEvent) => {
-          setStatusLabelText(`Tapjoy SDK connected with Warning: ErrorCode: ${event.code} ${event.message} `);
-        },
+        setStatusLabelText(`Tapjoy SDK connected with Warning: ErrorCode: ${event.code} ${event.message} `);
+      },
       );
       setIsConnecting(false);
       setSelectedLoggingLevel(await Tapjoy.getLoggingLevel());
       Tapjoy.setCustomParameter("my_parameter");
       setStatusLabelText(
         'Tapjoy SDK Connected' +
-          (Object.keys(flags).length > 0
-            ? `\nFlags: ${JSON.stringify(flags)}`
-            : '')
+        (Object.keys(flags).length > 0
+          ? `\nFlags: ${JSON.stringify(flags)}`
+          : '')
       );
       setIsSdkConnected(true);
     } catch (error: any) {
@@ -107,9 +110,9 @@ const MainScreen: React.FC = () => {
       let result = await Tapjoy.getCurrencyBalance();
       setStatusLabelText(
         'getCurrencyBalance returned ' +
-          result.currencyName +
-          ': ' +
-          result.amount
+        result.currencyName +
+        ': ' +
+        result.amount
       );
     } catch (error: any) {
       setStatusLabelText(error.toString());
@@ -154,69 +157,81 @@ const MainScreen: React.FC = () => {
     }
   };
 
+  const safeAreaInsets = useSafeAreaInsets();
+
   return (
-    <View style={styles.mainContainer}>
-      <ScrollView>
-        <SafeAreaView style={styles.container}>
-          <View style={styles.lineGap}>
-            <Text style={styles.statusText}>{statusLabelText}</Text>
-          </View>
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.textInput}
-              value={sdkKey}
-              onChangeText={setSdkKey}
-              placeholder="Enter SDK Key"
-            />
-            <Button
-              title="Connect"
-              style={[styles.zeroFlex, styles.leftSpacing]}
-              onPress={handleConnect}
-              disabled={isConnecting || Tapjoy.isConnected()}
-            />
-          </View>
-          <View style={styles.currencyOuterContainer}>
-            <Text style={styles.labelText}>{'Managed Currency:'}</Text>
+    <SafeAreaProvider>
+      <View style={[
+        styles.mainContainer,
+        {
+          paddingTop: safeAreaInsets.top,
+          paddingBottom: safeAreaInsets.bottom,
+          paddingLeft: safeAreaInsets.left,
+          paddingRight: safeAreaInsets.right,
+        },
+      ]}>
+        <ScrollView>
+          <View style={styles.container}>
+            <View style={styles.lineGap}>
+              <Text style={styles.statusText}>{statusLabelText}</Text>
+            </View>
             <View style={styles.inputContainer}>
-              <Text style={styles.userPropertiesLabel}>Amount:</Text>
               <TextInput
                 style={styles.textInput}
-                keyboardType='numeric'
-                value={curerncySpendAwardAmount}
-                onChangeText={handleAmountChange}
-                placeholder="Managed Currency value"
-              />
-            </View>
-            <View style={styles.currencyInnerContainer}>
-              <Button
-                style={styles.buttonGap}
-                title="Get"
-                onPress={getCurrencyBalance}
+                value={sdkKey}
+                onChangeText={setSdkKey}
+                placeholder="Enter SDK Key"
               />
               <Button
-                style={styles.buttonGap}
-                title="Spend"
-                onPress={spendCurrency}
+                title="Connect"
+                style={[styles.zeroFlex, styles.leftSpacing]}
+                onPress={handleConnect}
+                disabled={isConnecting || Tapjoy.isConnected()}
               />
-              <Button title="Award" onPress={awardCurrency} />
             </View>
-            <View style={styles.selectionContainer}>
-              <View style={styles.horizontalContainer}>
-                <Text style={styles.userPropertiesLabel}>Logging Level:</Text>
-                <SelectionMenu
-                  data={loggingLevelData}
-                  onSelectItem={handleLoggingLevelChange}
-                  initialSelectedItem={loggingLevelData[selectedLoggingLevel]}
+            <View style={styles.currencyOuterContainer}>
+              <Text style={styles.labelText}>{'Managed Currency:'}</Text>
+              <View style={styles.inputContainer}>
+                <Text style={styles.userPropertiesLabel}>Amount:</Text>
+                <TextInput
+                  style={styles.textInput}
+                  keyboardType='numeric'
+                  value={curerncySpendAwardAmount}
+                  onChangeText={handleAmountChange}
+                  placeholder="Managed Currency value"
                 />
+              </View>
+              <View style={styles.currencyInnerContainer}>
+                <Button
+                  style={styles.buttonGap}
+                  title="Get"
+                  onPress={getCurrencyBalance}
+                />
+                <Button
+                  style={styles.buttonGap}
+                  title="Spend"
+                  onPress={spendCurrency}
+                />
+                <Button title="Award" onPress={awardCurrency} />
+              </View>
+              <View style={styles.selectionContainer}>
+                <View style={styles.horizontalContainer}>
+                  <Text style={styles.userPropertiesLabel}>Logging Level:</Text>
+                  <SelectionMenu
+                    data={loggingLevelData}
+                    onSelectItem={handleLoggingLevelChange}
+                    initialSelectedItem={loggingLevelData[selectedLoggingLevel]}
+                  />
+                </View>
               </View>
             </View>
           </View>
-        </SafeAreaView>
-      </ScrollView>
-      <Text style={styles.versionText}>
-        Version: {TJVersion.getPluginVersion()}
-      </Text>
-    </View>
+        </ScrollView>
+        <Text style={styles.versionText}>
+          Version: {TJVersion.getPluginVersion()}
+        </Text>
+      </View>
+    </SafeAreaProvider>
   );
 };
 

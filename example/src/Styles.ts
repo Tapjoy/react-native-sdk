@@ -189,10 +189,11 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   offerwallScrollContainer: {
-    height: '70%',
+    flex: 1,
+    height: '80%',
   },
   owLogContainer: {
-    height: '30%',
+    height: '20%',
     padding: 10,
     backgroundColor: '#DDDDDD',
   },

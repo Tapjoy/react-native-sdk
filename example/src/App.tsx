@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { Dimensions } from 'react-native';
@@ -20,7 +20,6 @@ export default function App() {
       <ConnectContext.Provider value={{ isSdkConnected, setIsSdkConnected }}>
         <Tab.Navigator
             screenOptions={{
-            scrollEnabled: true,
             tabBarLabelPosition: 'beside-icon',
             tabBarLabelStyle: styles.tabBarLabelStyle,
             tabBarIconStyle: styles.tabBarIconStyle,

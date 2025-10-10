@@ -73,7 +73,7 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
   fun connect(sdkKey: String, connectFlags: ReadableMap, promise: Promise) {
     TapjoyPluginAPI.setPlugin("ReactNative");
 
-    Tapjoy.connect(this.currentActivity?.applicationContext, sdkKey, connectFlags.toHashtable(), object : TJConnectListener() {
+    Tapjoy.connect(this.getCurrentActivity()?.applicationContext, sdkKey, connectFlags.toHashtable(), object : TJConnectListener() {
       override fun onConnectSuccess() {
         promise.resolve(true)
       }
@@ -403,14 +403,6 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
         placements.remove(placement.name)
       }
 
-      override fun onPurchaseRequest(placement: TJPlacement, actionRequest: TJActionRequest, name: String) {
-
-      }
-
-      override fun onRewardRequest(placement: TJPlacement, actionRequest: TJActionRequest, currencyName: String, value: Int) {
-
-      }
-
       override fun onClick(placement: TJPlacement) {
 
       }
@@ -685,12 +677,12 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
 
   @ReactMethod
   fun optOutAdvertisingID(optOut: Boolean) {
-    Tapjoy.optOutAdvertisingID(this.currentActivity?.applicationContext, optOut)
+    Tapjoy.optOutAdvertisingID(this.getCurrentActivity()?.applicationContext, optOut)
   }
 
   @ReactMethod
   fun getOptOutAdvertisingID(promise: Promise) {
-    val optOutStatus = Tapjoy.getOptOutAdvertisingID(this.currentActivity?.applicationContext)
+    val optOutStatus = Tapjoy.getOptOutAdvertisingID(this.getCurrentActivity()?.applicationContext)
     if (optOutStatus != null) {
       promise.resolve(optOutStatus)
     } else {
@@ -703,8 +695,21 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
     val iterator = this.keySetIterator()
     while (iterator.hasNextKey()) {
       val key = iterator.nextKey()
-      val value = this.getString(key)
-      hashtable[key] = value?: continue
+      when (this.getType(key)) {
+        ReadableType.String -> {
+          this.getString(key)?.let { hashtable[key] = it }
+        }
+        ReadableType.Number -> {
+          val numberValue = this.getDouble(key)
+          val asInt = numberValue.toInt()
+          hashtable[key] = if (numberValue == asInt.toDouble()) asInt else numberValue
+        }
+        ReadableType.Boolean -> {
+          hashtable[key] = this.getBoolean(key)
+        }
+        ReadableType.Null, ReadableType.Map, ReadableType.Array -> {
+        }
+      }
     }
     return hashtable
   }

@@ -3,10 +3,13 @@ import {
   View,
   TextInput,
   Text,
-  SafeAreaView,
   ScrollView,
   Platform,
 } from 'react-native';
+import {
+  SafeAreaProvider,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Button from './Button';
 import styles from './Styles';
@@ -255,157 +258,169 @@ const UserProperties: React.FC = () => {
     setOptOut(item.value);
   };
 
+  const safeAreaInsets = useSafeAreaInsets();
+
   return (
-    <ScrollView>
-      <SafeAreaView style={styles.container}>
-        <View style={styles.lineGap}>
-          <Text style={styles.statusText}>{statusLabelText}</Text>
-        </View>
-        <View style={styles.inputContainer}>
-          <Text style={styles.userPropertiesLabel}>User ID:</Text>
-          <TextInput
-            style={styles.textInput}
-            value={userId}
-            onChangeText={setUserId}
-            placeholder="Enter user ID"
-            placeholderTextColor="#888"
-          />
-          <Button
-            style={styles.clearButton}
-            onPress={handleClearInput}
-            title={'\u2573'}
-          />
-        </View>
-        <View style={styles.inputContainer}>
-          <Text style={styles.userPropertiesLabel}>Max Level:</Text>
-          <TextInput
-            style={styles.textInput}
-            value={maxLevel}
-            keyboardType={'numeric'}
-            onChangeText={setMaxLevel}
-            placeholder="Enter max level"
-            placeholderTextColor="#888"
-          />
-          <Button
-            style={styles.clearButton}
-            onPress={handleClearMaxLevel}
-            title={'\u2573'}
-          />
-        </View>
-        <View style={styles.inputContainer}>
-          <Text style={styles.userPropertiesLabel}>User Level:</Text>
-          <TextInput
-            style={styles.textInput}
-            value={userLevel}
-            keyboardType={'numeric'}
-            onChangeText={setUserLevel}
-            placeholder="Enter user level"
-            placeholderTextColor="#888"
-          />
-          <Button
-            style={styles.clearButton}
-            onPress={handleClearUserLevel}
-            title={'\u2573'}
-          />
-        </View>
-        <View style={styles.inputContainer}>
-          <Text style={styles.userPropertiesLabel}>User Tags:</Text>
-          <TextInput
-            style={styles.textInput}
-            value={userTag}
-            onChangeText={setUserTag}
-            placeholder="Enter user tag"
-            placeholderTextColor="#888"
-          />
-        </View>
-        <View style={styles.horizontalContainer}>
-          <Button
-            style={styles.buttonTag}
-            onPress={handleAddUserTag}
-            title={'Add'}
-          />
-          <Button
-            style={styles.buttonTag}
-            onPress={handleRemoveUserTag}
-            title={'Remove'}
-          />
-          <Button
-            style={styles.buttonTag}
-            onPress={handleClearUserTag}
-            title={'Clear'}
-          />
-        </View>
-        <View style={styles.selectionContainer}>
-          <View style={styles.horizontalContainer}>
-            <Text style={styles.userPropertiesLabel}>User Segment:</Text>
-            <SelectionMenu
-              data={segmentData}
-              onSelectItem={handleUserSegment}
-              initialSelectedItem={initialUserSegmentItem}
+    <SafeAreaProvider>
+      <ScrollView>
+        <View style={[
+          styles.mainContainer,
+          {
+            paddingTop: safeAreaInsets.top,
+            paddingBottom: safeAreaInsets.bottom,
+            paddingLeft: safeAreaInsets.left,
+            paddingRight: safeAreaInsets.right,
+          },
+        ]}>
+          <View style={styles.lineGap}>
+            <Text style={styles.statusText}>{statusLabelText}</Text>
+          </View>
+          <View style={styles.inputContainer}>
+            <Text style={styles.userPropertiesLabel}>User ID:</Text>
+            <TextInput
+              style={styles.textInput}
+              value={userId}
+              onChangeText={setUserId}
+              placeholder="Enter user ID"
+              placeholderTextColor="#888"
+            />
+            <Button
+              style={styles.clearButton}
+              onPress={handleClearInput}
+              title={'\u2573'}
             />
           </View>
-        </View>
-        <View style={styles.selectionContainer}>
-          <View style={styles.horizontalContainer}>
-            <Text style={styles.userPropertiesLabel}>Subject To GDPR:</Text>
-            <SelectionMenu
-              data={statusData}
-              onSelectItem={handleSubjectToGDPR}
-              initialSelectedItem={initialSubjectToGDPRItem}
+          <View style={styles.inputContainer}>
+            <Text style={styles.userPropertiesLabel}>Max Level:</Text>
+            <TextInput
+              style={styles.textInput}
+              value={maxLevel}
+              keyboardType={'numeric'}
+              onChangeText={setMaxLevel}
+              placeholder="Enter max level"
+              placeholderTextColor="#888"
+            />
+            <Button
+              style={styles.clearButton}
+              onPress={handleClearMaxLevel}
+              title={'\u2573'}
             />
           </View>
-        </View>
-        <View style={styles.selectionContainer}>
-          <View style={styles.horizontalContainer}>
-            <Text style={styles.userPropertiesLabel}>Below Consent Age:</Text>
-            <SelectionMenu
-              data={statusData}
-              onSelectItem={handleBelowConsentAge}
-              initialSelectedItem={initialBelowConsentAgeItem}
+          <View style={styles.inputContainer}>
+            <Text style={styles.userPropertiesLabel}>User Level:</Text>
+            <TextInput
+              style={styles.textInput}
+              value={userLevel}
+              keyboardType={'numeric'}
+              onChangeText={setUserLevel}
+              placeholder="Enter user level"
+              placeholderTextColor="#888"
+            />
+            <Button
+              style={styles.clearButton}
+              onPress={handleClearUserLevel}
+              title={'\u2573'}
             />
           </View>
-        </View>
-        <View style={styles.selectionContainer}>
-          <View style={styles.horizontalContainer}>
-            <Text style={styles.userPropertiesLabel}>User Consent:</Text>
-            <SelectionMenu
-              data={statusData}
-              onSelectItem={handleUserConsent}
-              initialSelectedItem={initialUserConsentItem}
+          <View style={styles.inputContainer}>
+            <Text style={styles.userPropertiesLabel}>User Tags:</Text>
+            <TextInput
+              style={styles.textInput}
+              value={userTag}
+              onChangeText={setUserTag}
+              placeholder="Enter user tag"
+              placeholderTextColor="#888"
             />
           </View>
-        </View>
-        <View style={styles.inputContainer}>
-          <Text style={styles.userPropertiesLabel}>US Privacy:</Text>
-          <TextInput
-            style={styles.textInput}
-            value={USPrivacy}
-            onChangeText={handleUSPrivacy}
-            placeholder="E.g 1YYN"
-            placeholderTextColor="#888"
-          />
-        </View>
-        {Platform.OS === 'android' && (
+          <View style={styles.horizontalContainer}>
+            <Button
+              style={styles.buttonTag}
+              onPress={handleAddUserTag}
+              title={'Add'}
+            />
+            <Button
+              style={styles.buttonTag}
+              onPress={handleRemoveUserTag}
+              title={'Remove'}
+            />
+            <Button
+              style={styles.buttonTag}
+              onPress={handleClearUserTag}
+              title={'Clear'}
+            />
+          </View>
           <View style={styles.selectionContainer}>
             <View style={styles.horizontalContainer}>
-              <Text style={styles.userPropertiesLabel}>Opt Out Ad ID:</Text>
+              <Text style={styles.userPropertiesLabel}>User Segment:</Text>
               <SelectionMenu
-                data={optOutAdData}
-                onSelectItem={handleOptOut}
-                initialSelectedItem={initialOptOutItem}
+                data={segmentData}
+                onSelectItem={handleUserSegment}
+                initialSelectedItem={initialUserSegmentItem}
               />
             </View>
           </View>
-        )}
-        <View style={styles.buttonContainer}>
-          <Button
-            style={styles.button}
-            onPress={applyProperties}
-            title={'Apply'}
-          />
+          <View style={styles.selectionContainer}>
+            <View style={styles.horizontalContainer}>
+              <Text style={styles.userPropertiesLabel}>Subject To GDPR:</Text>
+              <SelectionMenu
+                data={statusData}
+                onSelectItem={handleSubjectToGDPR}
+                initialSelectedItem={initialSubjectToGDPRItem}
+              />
+            </View>
+          </View>
+          <View style={styles.selectionContainer}>
+            <View style={styles.horizontalContainer}>
+              <Text style={styles.userPropertiesLabel}>Below Consent Age:</Text>
+              <SelectionMenu
+                data={statusData}
+                onSelectItem={handleBelowConsentAge}
+                initialSelectedItem={initialBelowConsentAgeItem}
+              />
+            </View>
+          </View>
+          <View style={styles.selectionContainer}>
+            <View style={styles.horizontalContainer}>
+              <Text style={styles.userPropertiesLabel}>User Consent:</Text>
+              <SelectionMenu
+                data={statusData}
+                onSelectItem={handleUserConsent}
+                initialSelectedItem={initialUserConsentItem}
+              />
+            </View>
+          </View>
+          <View style={styles.inputContainer}>
+            <Text style={styles.userPropertiesLabel}>US Privacy:</Text>
+            <TextInput
+              style={styles.textInput}
+              value={USPrivacy}
+              onChangeText={handleUSPrivacy}
+              placeholder="E.g 1YYN"
+              placeholderTextColor="#888"
+            />
+          </View>
+          {Platform.OS === 'android' && (
+            <View style={styles.selectionContainer}>
+              <View style={styles.horizontalContainer}>
+                <Text style={styles.userPropertiesLabel}>Opt Out Ad ID:</Text>
+                <SelectionMenu
+                  data={optOutAdData}
+                  onSelectItem={handleOptOut}
+                  initialSelectedItem={initialOptOutItem}
+                />
+              </View>
+            </View>
+          )}
+          <View style={styles.buttonContainer}>
+            <Button
+              style={styles.button}
+              onPress={applyProperties}
+              title={'Apply'}
+            />
+          </View>
         </View>
-      </SafeAreaView>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaProvider>
   );
 };
 

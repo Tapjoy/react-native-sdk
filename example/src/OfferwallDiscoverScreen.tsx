@@ -1,15 +1,17 @@
 import React, { useEffect, useRef, useState, useContext } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
 import {
   FlatList,
-  SafeAreaView,
   ScrollView,
   Text,
   TextInput,
   View,
   Dimensions,
 } from 'react-native';
-import Tapjoy, { TJOfferwallDiscoverView } from 'tapjoy-react-native-sdk';
+import {
+  SafeAreaProvider,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
+import { TJOfferwallDiscoverView } from 'tapjoy-react-native-sdk';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import dayjs from 'dayjs';
 import Button from './Button';
@@ -88,100 +90,112 @@ const OfferwallDiscoverScreen: React.FC = () => {
     };
   };
 
+  const safeAreaInsets = useSafeAreaInsets();
+
   return (
-    <View style={styles.mainContainer}>
-      <ScrollView style={styles.offerwallScrollContainer}>
-        <SafeAreaView style={styles.container}>
-          <View style={styles.inputContainer}>
-            <Text style={styles.textInputLabel}>Width</Text>
-            <TextInput
-              keyboardType="numeric"
-              style={styles.textInput}
-              onChangeText={(value) => {
-                value = stripNonNumericValue(value);
-                setWidth(value);
-                widthChangedManually.current = true;
-              }}
-              value={width}
-              autoCorrect={false}
-              placeholderTextColor="#888"
-              autoCapitalize="none"
-            />
-            <Text style={[styles.textInputLabel, styles.leftSpacing]}>
-              Height
-            </Text>
-            <TextInput
-              keyboardType="numeric"
-              style={styles.textInput}
-              onChangeText={(value) => {
-                value = stripNonNumericValue(value);
-                setHeight(value);
-              }}
-              value={height.replace(/\D/g, '')}
-              autoCorrect={false}
-              placeholderTextColor="#888"
-              autoCapitalize="none"
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.textInput}
-              value={offerwallPlacementName}
-              onChangeText={setOfferwallPlacementName}
-              autoCorrect={false}
-              placeholder="Enter Placement Name"
-              placeholderTextColor="#888"
-              autoCapitalize="none"
-            />
-            <Button
-              style={styles.clearButton}
-              onPress={handleClearInput}
-              title={'\u2573'}
-            />
-          </View>
-          <View style={styles.buttonContainer}>
-            <Button
-              onPress={loadContent}
-              disabled={!isSdkConnected}
-              title={'Request'}
-            />
-            <View style={styles.buttonGap} />
-            <Button onPress={clearContent} title={'Clear'} />
-          </View>
-          <TJOfferwallDiscoverView
-            ref={owdRef}
-            style={getViewStyle()}
-            onRequestSuccess={(event: any) => {
-              addLogItem(event.nativeEvent.result);
-            }}
-            onRequestFailure={(event: any) =>
-              addLogItem(
-                `requestFailure: code:${event.nativeEvent.errorCode}, message:${event.nativeEvent.errorMessage}`
-              )
-            }
-            onContentReady={(event: any) =>
-              addLogItem(event.nativeEvent.result)
-            }
-            onContentError={(event: any) =>
-              addLogItem(
-                `contentError: code:${event.nativeEvent.errorCode}, message:${event.nativeEvent.errorMessage}`
-              )
-            }
-          />
-        </SafeAreaView>
-      </ScrollView>
-      <View style={styles.owLogContainer}>
-        <FlatList
-          data={logData}
-          renderItem={({ item }) => (
-            <View>
-              <Text style={styles.logText}>{item}</Text>
+    <SafeAreaProvider>
+      <View style={[
+        styles.mainContainer,
+        {
+          paddingTop: safeAreaInsets.top,
+          paddingBottom: safeAreaInsets.bottom,
+          paddingLeft: safeAreaInsets.left,
+          paddingRight: safeAreaInsets.right,
+        },
+      ]}>
+        <ScrollView style={styles.offerwallScrollContainer}>
+          <View style={styles.container}>
+            <View style={styles.inputContainer}>
+              <Text style={styles.textInputLabel}>Width</Text>
+              <TextInput
+                keyboardType="numeric"
+                style={styles.textInput}
+                onChangeText={(value) => {
+                  value = stripNonNumericValue(value);
+                  setWidth(value);
+                  widthChangedManually.current = true;
+                }}
+                value={width}
+                autoCorrect={false}
+                placeholderTextColor="#888"
+                autoCapitalize="none"
+              />
+              <Text style={[styles.textInputLabel, styles.leftSpacing]}>
+                Height
+              </Text>
+              <TextInput
+                keyboardType="numeric"
+                style={styles.textInput}
+                onChangeText={(value) => {
+                  value = stripNonNumericValue(value);
+                  setHeight(value);
+                }}
+                value={height.replace(/\D/g, '')}
+                autoCorrect={false}
+                placeholderTextColor="#888"
+                autoCapitalize="none"
+              />
             </View>
-          )}
-          keyExtractor={(_item, index) => index.toString()}
-        />
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.textInput}
+                value={offerwallPlacementName}
+                onChangeText={setOfferwallPlacementName}
+                autoCorrect={false}
+                placeholder="Enter Placement Name"
+                placeholderTextColor="#888"
+                autoCapitalize="none"
+              />
+              <Button
+                style={styles.clearButton}
+                onPress={handleClearInput}
+                title={'\u2573'}
+              />
+            </View>
+            <View style={styles.buttonContainer}>
+              <Button
+                onPress={loadContent}
+                disabled={!isSdkConnected}
+                title={'Request'}
+              />
+              <View style={styles.buttonGap} />
+              <Button onPress={clearContent} title={'Clear'} />
+            </View>
+            <TJOfferwallDiscoverView
+              ref={owdRef}
+              style={getViewStyle()}
+              onRequestSuccess={(event: any) => {
+                addLogItem(event.nativeEvent.result);
+              }}
+              onRequestFailure={(event: any) =>
+                addLogItem(
+                  `requestFailure: code:${event.nativeEvent.errorCode}, message:${event.nativeEvent.errorMessage}`
+                )
+              }
+              onContentReady={(event: any) =>
+                addLogItem(event.nativeEvent.result)
+              }
+              onContentError={(event: any) =>
+                addLogItem(
+                  `contentError: code:${event.nativeEvent.errorCode}, message:${event.nativeEvent.errorMessage}`
+                )
+              }
+            />
+          </View>
+        </ScrollView>
+        <View style={styles.owLogContainer}>
+          <FlatList
+            data={logData}
+            renderItem={({ item }) => (
+              <View>
+                <Text style={styles.logText}>{item}</Text>
+              </View>
+            )}
+            keyExtractor={(_item, index) => index.toString()}
+          />
+        </View>
       </View>
-    </View>
+    </SafeAreaProvider>
   );
 };
 

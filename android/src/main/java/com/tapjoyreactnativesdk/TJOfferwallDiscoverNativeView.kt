@@ -79,8 +79,8 @@ class TJOfferwallDiscoverNativeView : TJOfferwallDiscoverView, TJOfferwallDiscov
     }
 }
 
-class OfferwallDiscoverEvent(surfaceId: Int, viewId: Int, private val eventName: String, private val data: WritableMap) : Event<OfferwallDiscoverEvent>(surfaceId, viewId) {
-    override fun getEventName() = eventName
+class OfferwallDiscoverEvent(surfaceId: Int, viewId: Int, private val name: String, private val data: WritableMap) : Event<OfferwallDiscoverEvent>(surfaceId, viewId) {
+    override fun getEventName() = name
 
     // All events for a given view can be coalesced.
     override fun getCoalescingKey(): Short = 0
