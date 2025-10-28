@@ -17,7 +17,7 @@ import {
 } from 'react-native-tracking-transparency';
 import styles from './Styles';
 import Button from './Button';
-import Tapjoy, { TJVersion, TapjoyEvent, TJLoggingLevel } from 'tapjoy-react-native-sdk';
+import Tapjoy, { TJVersion, type TapjoyEvent, TJLoggingLevel } from 'tapjoy-react-native-sdk';
 import { ConnectContext } from './ConnectContext';
 import SelectionMenu from './SelectionMenu';
 

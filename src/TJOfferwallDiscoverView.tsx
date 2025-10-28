@@ -2,7 +2,7 @@ import {
   findNodeHandle,
   requireNativeComponent,
   UIManager,
-  ViewStyle,
+  type ViewStyle,
 } from 'react-native';
 import React from 'react';
 

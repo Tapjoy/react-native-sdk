@@ -7,7 +7,7 @@ import TJOfferwallDiscoverView from './TJOfferwallDiscoverView';
 import TJPurchase from './TJPurchase';
 import TJLoggingLevel from './TJLoggingLevel';
 import Tapjoy from './Tapjoy';
-import { TapjoyEvent } from './TapjoyEvent';
+import type { TapjoyEvent } from './TapjoyEvent';
 
 
 export {
