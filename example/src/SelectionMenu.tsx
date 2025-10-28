@@ -9,7 +9,7 @@ interface Item {
 
 interface Props {
   data: Item[];
-  initialSelectedItem: Item | null;
+  initialSelectedItem?: Item;
   onSelectItem: (item: Item) => void;
 }
 
@@ -18,7 +18,7 @@ const SelectionMenu: React.FC<Props> = ({
   initialSelectedItem,
   onSelectItem,
 }) => {
-  const [selectedItem, setSelectedItem] = useState<Item | null>(
+  const [selectedItem, setSelectedItem] = useState<Item | undefined>(
     initialSelectedItem
   );
 

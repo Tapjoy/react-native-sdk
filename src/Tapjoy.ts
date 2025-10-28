@@ -2,7 +2,7 @@ import { NativeModules, Platform, NativeEventEmitter } from 'react-native';
 import TJSegment from './TJSegment';
 import TJConnect from './TJConnect';
 import TJLoggingLevel from './TJLoggingLevel';
-import { TapjoyEvent } from './TapjoyEvent';
+import type { TapjoyEvent } from './TapjoyEvent';
 
 const LINKING_ERROR =
 `The package 'tapjoy-react-native-sdk' doesn't seem to be linked. Make sure: \n\n` +
