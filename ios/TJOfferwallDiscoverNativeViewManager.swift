@@ -20,14 +20,14 @@ class TJOfferwallDiscoverNativeViewManager: RCTViewManager, TJOfferwallDiscoverD
     /**
      Show the OfferwallDiscover content.
      */
-    @objc func requestContent(_ tag: NSNumber, _ placement: String) {
+    @objc func requestContent(_ tag: NSNumber, placement: String) {
         DispatchQueue.main.async {
             self.owdView.requestContent(placement)
         }
     }
     
     /**
-     Show current content.
+     Clear displayed content.
      */
     @objc func clearContent(_ tag: NSNumber) {
         DispatchQueue.main.async {

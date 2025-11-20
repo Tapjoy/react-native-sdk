@@ -1,58 +1,75 @@
-import {
-  findNodeHandle,
-  requireNativeComponent,
-  UIManager,
-  ViewStyle,
-} from 'react-native';
+import { findNodeHandle, requireNativeComponent, UIManager } from 'react-native';
 import React from 'react';
+import type { HostComponent } from 'react-native';
+import type { TJOfferwallDiscoverViewProps as FabricProps } from './TJOfferwallDiscoverViewNativeComponent';
+import { isFabricEnabled } from './utils/ArchitectureDetection';
 
-enum Command {
-  REQUEST_CONTENT = 'requestContent',
-  CLEAR_CONTENT = 'clearContent',
-}
+type FabricModule = typeof import('./TJOfferwallDiscoverViewNativeComponent');
 
-const TJOfferwallDiscoverNativeView = requireNativeComponent(
-  'TJOfferwallDiscoverNativeView'
-);
+let fabricModule: FabricModule | null = null;
+let legacyComponent: HostComponent<FabricProps> | null = null;
 
-interface TJOfferwallDiscoverViewProps {
-  style?: ViewStyle;
-  onRequestSuccess?: Function;
-  onRequestFailure?: Function;
-  onContentReady?: Function;
-  onContentError?: Function;
-}
-
-export default class TJOfferwallDiscoverView extends React.Component<TJOfferwallDiscoverViewProps> {
-  nativeCompHandle: number | null = null;
-  constructor(props: TJOfferwallDiscoverViewProps) {
-    super(props);
+const getFabricModule = (): FabricModule => {
+  if (fabricModule == null) {
+    fabricModule = require('./TJOfferwallDiscoverViewNativeComponent');
   }
+  return fabricModule!;
+};
 
-  override render () {
+const getLegacyComponent = (): HostComponent<FabricProps> => {
+  if (legacyComponent == null) {
+    legacyComponent = requireNativeComponent('TJOfferwallDiscoverNativeView');
+  }
+  return legacyComponent;
+};
+
+const getNativeComponent = (): HostComponent<FabricProps> => {
+  if (isFabricEnabled()) {
+    return getFabricModule().default as HostComponent<FabricProps>;
+  }
+  return getLegacyComponent();
+};
+
+export default class TJOfferwallDiscoverView extends React.Component<FabricProps> {
+  private viewRef = React.createRef<React.ComponentRef<ReturnType<typeof getNativeComponent>>>();
+
+  override render() {
+    const NativeComponent = getNativeComponent();
     return (
-      <TJOfferwallDiscoverNativeView
+      <NativeComponent
         {...this.props}
-        ref={(ref) => {
-          this.nativeCompHandle = findNodeHandle(ref);
-        }}
+        ref={this.viewRef}
       />
     );
   }
 
   requestContent(placement: string) {
-    UIManager.dispatchViewManagerCommand(
-      this.nativeCompHandle!!,
-      Command.REQUEST_CONTENT,
-      [placement]
-    );
+    if (isFabricEnabled() && this.viewRef.current) {
+      getFabricModule().Commands.requestContent(this.viewRef.current, placement);
+    } else {
+      const nodeHandle = findNodeHandle(this.viewRef.current);
+      if (nodeHandle != null) {
+        UIManager.dispatchViewManagerCommand(
+          nodeHandle,
+          'requestContent',
+          [placement]
+        );
+      }
+    }
   }
 
   clearContent() {
-    UIManager.dispatchViewManagerCommand(
-      this.nativeCompHandle!!,
-      Command.CLEAR_CONTENT,
-      []
-    );
+    if (isFabricEnabled() && this.viewRef.current) {
+      getFabricModule().Commands.clearContent(this.viewRef.current);
+    } else {
+      const nodeHandle = findNodeHandle(this.viewRef.current);
+      if (nodeHandle != null) {
+        UIManager.dispatchViewManagerCommand(
+          nodeHandle,
+          'clearContent',
+          []
+        );
+      }
+    }
   }
 }

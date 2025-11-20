@@ -83,7 +83,7 @@ declare class Tapjoy {
        *
        * @param userID
        *            user ID you wish to assign to this device
-     * @return the user ID if successful or error message if failed.
+       * @return the user ID if successful or error message if failed.
        */
     static setUserId(userID: string): Promise<any>;
     /**

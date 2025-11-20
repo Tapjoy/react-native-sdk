@@ -5,6 +5,7 @@ import {
   Platform,
   Text,
   ScrollView,
+  TurboModuleRegistry
 } from 'react-native';
 import {
   SafeAreaProvider,

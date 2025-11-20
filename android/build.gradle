@@ -21,12 +21,7 @@ def isNewArchitectureEnabled() {
 
 apply plugin: "com.android.library"
 apply plugin: "kotlin-android"
-
-def appProject = rootProject.allprojects.find { it.plugins.hasPlugin('com.android.application') }
-
-if (isNewArchitectureEnabled()) {
-  apply plugin: "com.facebook.react"
-}
+apply plugin: "com.facebook.react"
 
 def getExtOrDefault(name) {
   return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties["TapjoyReactNativeSdk_" + name]
@@ -81,14 +76,12 @@ dependencies {
   //noinspection GradleDynamicVersion
   implementation 'com.facebook.react:react-native:0.81.0'
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-  implementation 'com.tapjoy:tapjoy-android-sdk:14.5.0'
+  implementation 'com.tapjoy:tapjoy-android-sdk:14.6.0'
   implementation "com.google.android.gms:play-services-ads-identifier:18.0.1"
 }
 
-if (isNewArchitectureEnabled()) {
-  react {
-    jsRootDir = file("../src/")
-    libraryName = "TapjoyReactNativeSdk"
-    codegenJavaPackageName = "com.tapjoyreactnativesdk"
-  }
+react {
+  jsRootDir = file("../src/")
+  libraryName = "TapjoyReactNativeSdk"
+  codegenJavaPackageName = "com.tapjoyreactnativesdk"
 }

@@ -1,12 +1,14 @@
 {
   "name": "TapjoyReactNativeSdkExample",
-  "version": "14.5.0",
+  "version": "14.6.0",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "start": "react-native start",
-    "pods": "pod-install --quiet"
+    "pods": "pod-install --quiet",
+    "set-new-arch": "./scripts/set-arch.sh true",
+    "set-old-arch": "./scripts/set-arch.sh false"
   },
   "dependencies": {
     "tapjoy-react-native-sdk": "file:../",

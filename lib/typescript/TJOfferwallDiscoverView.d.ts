@@ -1,17 +1,8 @@
-import { ViewStyle } from 'react-native';
 import React from 'react';
-interface TJOfferwallDiscoverViewProps {
-    style?: ViewStyle;
-    onRequestSuccess?: Function;
-    onRequestFailure?: Function;
-    onContentReady?: Function;
-    onContentError?: Function;
-}
-export default class TJOfferwallDiscoverView extends React.Component<TJOfferwallDiscoverViewProps> {
-    nativeCompHandle: number | null;
-    constructor(props: TJOfferwallDiscoverViewProps);
+import type { TJOfferwallDiscoverViewProps as FabricProps } from './TJOfferwallDiscoverViewNativeComponent';
+export default class TJOfferwallDiscoverView extends React.Component<FabricProps> {
+    private viewRef;
     render(): React.JSX.Element;
     requestContent(placement: string): void;
     clearContent(): void;
 }
-export {};

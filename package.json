@@ -1,6 +1,6 @@
 {
   "name": "tapjoy-react-native-sdk",
-  "version": "14.5.0",
+  "version": "14.6.0",
   "description": "ReactNative Plugin for Tapjoy SDK",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -46,7 +46,7 @@
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "example": "yarn --cwd example",
     "bootstrap": "yarn example && yarn install && yarn example pods",
-    "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build temp package",
+    "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build temp package && cd example/android && ./gradlew clean",
     "doc": "typedoc --entryPointStrategy expand src/*",
     "postinstall": "echo 'For Android, please ensure your project’s Gradle is configured correctly. Instructions can be found at: https://dev.tapjoy.com/en/reactnative-plugin/Quickstart'"
   },
@@ -141,5 +141,10 @@
   },
   "dependencies": {
     "eventemitter3": "^5.0.1"
+  },
+  "codegenConfig": {
+    "name": "TapjoyReactNativeSdk",
+    "type": "all",
+    "jsSrcsDir": "src"
   }
 }

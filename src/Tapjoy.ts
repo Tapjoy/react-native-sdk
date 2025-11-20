@@ -3,6 +3,8 @@ import TJSegment from './TJSegment';
 import TJConnect from './TJConnect';
 import TJLoggingLevel from './TJLoggingLevel';
 import { TapjoyEvent } from './TapjoyEvent';
+import NativeTapjoyReactNativeSdk from './NativeTapjoyReactNativeSdk';
+import { isTurboModuleEnabled } from './utils/ArchitectureDetection';
 
 const LINKING_ERROR =
 `The package 'tapjoy-react-native-sdk' doesn't seem to be linked. Make sure: \n\n` +
@@ -10,16 +12,22 @@ Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
 '- You rebuilt the app after installing the package\n' +
 '- You are not using Expo Go\n';
 
-const TapjoyAPI = NativeModules.TapjoyReactNativeSdk
-? NativeModules.TapjoyReactNativeSdk
-: new Proxy(
-    {},
-    {
-      get() {
-        throw new Error(LINKING_ERROR);
-      },
-    }
-  );
+const TapjoyAPI = isTurboModuleEnabled()
+  ? NativeTapjoyReactNativeSdk
+  : NativeModules.TapjoyReactNativeSdk
+  ? NativeModules.TapjoyReactNativeSdk
+  : new Proxy(
+      {},
+      {
+        get() {
+          throw new Error(LINKING_ERROR);
+        },
+      }
+    );
+
+const NativeModuleForEmitter: any = isTurboModuleEnabled()
+  ? NativeTapjoyReactNativeSdk
+  : NativeModules.TapjoyReactNativeSdk;
 
 class Tapjoy {
 
@@ -33,8 +41,7 @@ class Tapjoy {
    * @return true if successful or error message if failed.
    */
   public static async connect(sdkKey: string, flags: object, onWarning?: (message: TapjoyEvent) => void) {
-    const TJ = NativeModules.TapjoyReactNativeSdk;
-    const TapjoyEmitter = new NativeEventEmitter(TJ);
+    const TapjoyEmitter = new NativeEventEmitter(NativeModuleForEmitter);
     const TapjoyEventType = 'Tapjoy';
     const subscription = TapjoyEmitter.addListener(
       TapjoyEventType,
@@ -143,7 +150,7 @@ class Tapjoy {
 	 *
 	 * @param userID
 	 *            user ID you wish to assign to this device
-   * @return the user ID if successful or error message if failed.
+	 * @return the user ID if successful or error message if failed.
 	 */
   public static async setUserId(userID: string) { 
     return await TapjoyAPI.setUserId(userID);

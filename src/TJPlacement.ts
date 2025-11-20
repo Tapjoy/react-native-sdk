@@ -1,9 +1,13 @@
 import { NativeEventEmitter, NativeModules } from 'react-native';
 import { EventEmitter } from 'eventemitter3';
 import TJEntryPoint from './TJEntryPoint';
+import NativeTapjoyReactNativeSdk from './NativeTapjoyReactNativeSdk';
+import { isTurboModuleEnabled } from './utils/ArchitectureDetection';
 
-const Tapjoy = NativeModules.TapjoyReactNativeSdk;
-const TapjoyEmitter = new NativeEventEmitter(Tapjoy);
+const TapjoyNative = isTurboModuleEnabled()
+  ? (NativeTapjoyReactNativeSdk as any)
+  : NativeModules.TapjoyReactNativeSdk;
+const TapjoyEmitter = new NativeEventEmitter(TapjoyNative);
 
 const TapjoyEventType = 'TapjoyPlacement';
 
@@ -49,7 +53,7 @@ class TJPlacement extends EventEmitter {
     super();
     this.name = name;
     this.error = undefined;
-    Tapjoy.createPlacement(this.name);
+    TapjoyNative.createPlacement(this.name);
   }
 
   /**
@@ -77,7 +81,7 @@ class TJPlacement extends EventEmitter {
         }
       }
     );
-    Tapjoy.requestPlacement(this.name);
+    TapjoyNative.requestPlacement(this.name);
   }
 
   /**
@@ -96,7 +100,7 @@ class TJPlacement extends EventEmitter {
         }
       }
     );
-    Tapjoy.showPlacement(this.name);
+    TapjoyNative.showPlacement(this.name);
   }
 
   /**
@@ -105,7 +109,7 @@ class TJPlacement extends EventEmitter {
    * @returns {boolean} True if the content is ready; otherwise, false.
    */
   isContentReady(): boolean {
-    return Tapjoy.isContentReady(this.name);
+    return TapjoyNative.isContentReady(this.name);
   }
 
   /**
@@ -114,7 +118,7 @@ class TJPlacement extends EventEmitter {
    * @returns {boolean} True if the content is available; otherwise, false.
    */
   isContentAvailable(): boolean {
-    return Tapjoy.isContentAvailable(this.name);
+    return TapjoyNative.isContentAvailable(this.name);
   }
 
   /**
@@ -127,7 +131,7 @@ class TJPlacement extends EventEmitter {
     currencyId: String,
     currencyBalance: Number
   ): Promise<void> {
-    await Tapjoy.setCurrencyBalance(currencyBalance, currencyId, this.name);
+    await TapjoyNative.setCurrencyBalance(currencyBalance, currencyId, this.name);
   }
 
   /**
@@ -137,7 +141,7 @@ class TJPlacement extends EventEmitter {
    * @return {Number} currencyBalance - The amount of the currency.
    */
   async getCurrencyBalance(currencyId: String): Promise<Number> {
-    return await Tapjoy.getPlacementCurrencyBalance(currencyId, this.name);
+    return await TapjoyNative.getPlacementCurrencyBalance(currencyId, this.name);
   }
 
   /**
@@ -147,7 +151,7 @@ class TJPlacement extends EventEmitter {
    * @param {String} currencyId The identifier of the currency.
    */
   async setRequiredAmount(amount: Number, currencyId: String): Promise<void> {
-    await Tapjoy.setRequiredAmount(amount, currencyId, this.name);
+    await TapjoyNative.setRequiredAmount(amount, currencyId, this.name);
   }
 
   /**
@@ -157,7 +161,7 @@ class TJPlacement extends EventEmitter {
    * @return {Number} The amount of currency the user needs. -1 if not available.
    */
   async getRequiredAmount(currencyId: String): Promise<Number> {
-    return await Tapjoy.getRequiredAmount(currencyId, this.name);
+    return await TapjoyNative.getRequiredAmount(currencyId, this.name);
   }
 
   /**
@@ -167,7 +171,7 @@ class TJPlacement extends EventEmitter {
    * @see TJEntryPoint
    */
   setEntryPoint(entryPoint: TJEntryPoint): void {
-    Tapjoy.setEntryPoint(this.name, Object.values(TJEntryPoint).indexOf(entryPoint));
+    TapjoyNative.setEntryPoint(this.name, Object.values(TJEntryPoint).indexOf(entryPoint));
   }
 
   /**
@@ -178,7 +182,7 @@ class TJPlacement extends EventEmitter {
    */
   async getEntryPoint(): Promise<TJEntryPoint | undefined> {
     const entryPointValue: TJEntryPoint | undefined =
-      Object.values(TJEntryPoint)[await Tapjoy.getEntryPoint(this.name)];
+      Object.values(TJEntryPoint)[await TapjoyNative.getEntryPoint(this.name)];
     return entryPointValue;
   }
 }

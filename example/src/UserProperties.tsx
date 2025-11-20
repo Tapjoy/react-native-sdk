@@ -40,6 +40,7 @@ const UserProperties: React.FC = () => {
   const [userSegment, setUserSegment] = useState<TJSegment>(TJSegment.Unknown);
   const [userTag, setUserTag] = useState<string>('');
   const [optOut, setOptOut] = useState<boolean>(false);
+  const [usageStatsConsent, setUsageStatsConsent] = useState<TJStatus>(TJStatus.Unknown);
   const isFocused = useIsFocused();
 
   const statusData = [
@@ -115,6 +116,7 @@ const UserProperties: React.FC = () => {
       setBelowConsentAge(await privacyPolicy.getBelowConsentAge());
       setSubjectToGDPR(await privacyPolicy.getSubjectToGDPR());
       setUserConsent(await privacyPolicy.getUserConsent());
+      setUsageStatsConsent(await privacyPolicy.getUsageStatsConsent());
       setUSPrivacy(await privacyPolicy.getUSPrivacy());
     } catch (error) {
       setStatusLabelText(`Failed to retrieve Privacy Policy: ${error}`);
@@ -164,7 +166,7 @@ const UserProperties: React.FC = () => {
   const initialSubjectToGDPRItem = findStatus(isSubjectToGDPR);
   const initialUserSegmentItem = findSegment(userSegment);
   const initialOptOutItem = findOptOut(optOut);
-
+  const initialUsageStatsConsentItem = findStatus(usageStatsConsent);
   const applyProperties = async () => {
     try {
       let trimmedUserId = userId?.trim();
@@ -182,6 +184,7 @@ const UserProperties: React.FC = () => {
       privacyPolicy.setSubjectToGDPRStatus(isSubjectToGDPR);
       privacyPolicy.setBelowConsentAgeStatus(isBelowConsentAge);
       privacyPolicy.setUserConsentStatus(userConsent);
+      privacyPolicy.setUsageStatsConsent(usageStatsConsent);
       privacyPolicy.setUSPrivacy(USPrivacy);
       if (Platform.OS === 'android') {
         privacyPolicy.optOutAdvertisingID(optOut);
@@ -252,6 +255,10 @@ const UserProperties: React.FC = () => {
 
   const handleUserSegment = (item: { value: TJSegment; label: string }) => {
     setUserSegment(item.value);
+  };
+
+  const handleUsageStatsConsent = (item: { value: TJStatus; label: string }) => {
+    setUsageStatsConsent(item.value);
   };
 
   const handleOptOut = (item: { value: boolean; label: string }) => {
@@ -389,6 +396,18 @@ const UserProperties: React.FC = () => {
               />
             </View>
           </View>
+          {Platform.OS === 'android' && (
+            <View style={styles.selectionContainer}>
+              <View style={styles.horizontalContainer}>
+                <Text style={styles.userPropertiesLabel}>Usage Stats Consent:</Text>
+                <SelectionMenu
+                  data={statusData}
+                  onSelectItem={handleUsageStatsConsent}
+                  initialSelectedItem={initialUsageStatsConsentItem}
+                />
+              </View>
+            </View>
+          )}
           <View style={styles.inputContainer}>
             <Text style={styles.userPropertiesLabel}>US Privacy:</Text>
             <TextInput

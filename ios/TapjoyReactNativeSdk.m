@@ -1,17 +1,23 @@
 #import <React/RCTBridgeModule.h>
 #import <React/RCTEventEmitter.h>
 
-@interface RCT_EXTERN_MODULE(TapjoyReactNativeSdk, NSObject)
+#ifdef RCT_NEW_ARCH_ENABLED
+#if __has_include("TapjoyReactNativeSdkSpec.h")
+#import "TapjoyReactNativeSdkSpec.h"
+#endif
+#endif
+
+@interface RCT_EXTERN_MODULE(TapjoyReactNativeSdk, RCTEventEmitter)
 
 #pragma mark - SDK
-RCT_EXTERN_METHOD(connect:(NSString *)sdkKey connectFlags:(NSDictionary *)connectFlags resolve:(RCTPromiseResolveBlock *)resolve reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(setLoggingLevel:(NSNumber *)loggingLevel)
-RCT_EXTERN_METHOD(getLoggingLevel:(RCTPromiseResolveBlock *)resolve reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(connect:(NSString *)sdkKey connectFlags:(NSDictionary *)connectFlags resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(setLoggingLevel:(nonnull NSNumber *)loggingLevel)
+RCT_EXTERN_METHOD(getLoggingLevel:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN__BLOCKING_SYNCHRONOUS_METHOD(isConnected)
 RCT_EXTERN_METHOD(setCustomParameter:(NSString *)customParameter)
-RCT_EXTERN_METHOD(getCustomParameter:(RCTPromiseResolveBlock *)resolve reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(setUserId:(NSString *)userId resolve:(RCTPromiseResolveBlock *)resolve reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(getUserId:(RCTPromiseResolveBlock *)resolve reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(getCustomParameter:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(setUserId:(NSString *)userId resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(getUserId:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(setUserSegment:(nonnull NSNumber *)userSegment)
 RCT_EXTERN_METHOD(getUserSegment: (RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(setMaxLevel:(int)maxLevel)
@@ -30,16 +36,16 @@ RCT_EXTERN_METHOD(showPlacement:(NSString *)name)
 RCT_EXTERN__BLOCKING_SYNCHRONOUS_METHOD(isContentReady:(NSString *)name)
 RCT_EXTERN__BLOCKING_SYNCHRONOUS_METHOD(isContentAvailable:(NSString *)name)
 RCT_EXTERN_METHOD(setEntryPoint:(NSString *)name entryPoint:(nonnull NSNumber *)entryPoint)
-RCT_EXTERN_METHOD(getEntryPoint:(NSString *)name resolve:(RCTPromiseResolveBlock *)resolve reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(setCurrencyBalance:(NSInteger)amount currencyId:(NSString *)currencyId placementName:(NSString *)placementName resolve:(RCTPromiseResolveBlock *)resolve reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(getPlacementCurrencyBalance:(NSString *)currencyId placementName:(NSString *)placementName resolve:(RCTPromiseResolveBlock *)resolve reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(setRequiredAmount:(NSInteger)requiredAmount currencyId:(NSString *)currencyId placementName:(NSString *)placementName resolve:(RCTPromiseResolveBlock *)resolve reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(getRequiredAmount:(NSString *)currencyId placementName:(NSString *)placementName resolve:(RCTPromiseResolveBlock *)resolve reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(getEntryPoint:(NSString *)name resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(setCurrencyBalance:(NSInteger)amount currencyId:(NSString *)currencyId placementName:(NSString *)placementName resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(getPlacementCurrencyBalance:(NSString *)currencyId placementName:(NSString *)placementName resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(setRequiredAmount:(NSInteger)requiredAmount currencyId:(NSString *)currencyId placementName:(NSString *)placementName resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(getRequiredAmount:(NSString *)currencyId placementName:(NSString *)placementName resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
 
 #pragma mark - Currency
-RCT_EXTERN_METHOD(getCurrencyBalance:(RCTPromiseResolveBlock *)resolve reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(spendCurrency:(int)amount resolve:(RCTPromiseResolveBlock *)resolve reject:(RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(awardCurrency:(int)amount resolve:(RCTPromiseResolveBlock *)resolve reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(getCurrencyBalance:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(spendCurrency:(int)amount resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(awardCurrency:(int)amount resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
 
 #pragma mark - Privacy
 RCT_EXTERN_METHOD(setUSPrivacy:(NSString *)privacyValue)
@@ -50,6 +56,10 @@ RCT_EXTERN_METHOD(getBelowConsentAge: (RCTPromiseResolveBlock)resolve reject:(RC
 RCT_EXTERN_METHOD(getSubjectToGDPR: (RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(getUserConsent: (RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(getUSPrivacy: (RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(getUsageStatsConsent:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(setUsageStatsConsent:(nonnull NSNumber *)usageStatsConsent)
+RCT_EXTERN_METHOD(optOutAdvertisingID:(BOOL)optOut)
+RCT_EXTERN_METHOD(getOptOutAdvertisingID:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
 + (BOOL)requiresMainQueueSetup
 {
   return NO;
@@ -58,4 +68,15 @@ RCT_EXTERN_METHOD(getUSPrivacy: (RCTPromiseResolveBlock)resolve reject:(RCTPromi
 #pragma mark - Purchase
 RCT_EXTERN_METHOD(trackPurchase:(NSString *)currencyCode price:(nonnull NSNumber *)price);
 
+#pragma mark - Event Emitter
+RCT_EXTERN_METHOD(addListener:(NSString *)eventName)
+RCT_EXTERN_METHOD(removeListeners:(double)count)
+
 @end
+
+#ifdef RCT_NEW_ARCH_ENABLED
+#if __has_include("TapjoyReactNativeSdkSpec.h")
+@interface TapjoyReactNativeSdk () <NativeTapjoyReactNativeSdkSpec>
+@end
+#endif
+#endif

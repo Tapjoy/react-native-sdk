@@ -19,12 +19,14 @@ class TapjoyReactNativeSdk: RCTEventEmitter {
         return ["TapjoyPlacement", "Tapjoy"];
     }
     
-    @objc override func startObserving() {
+    @objc override func addListener(_ eventName: String) {
         listeners += 1
+        super.addListener(eventName)
     }
-
-    @objc override func stopObserving() {
-        listeners -= 1
+    
+    @objc override func removeListeners(_ count: Double) {
+        listeners -= Int(count)
+        super.removeListeners(count)
     }
     
     func attemptSendEvent(withName name: String, body: [AnyHashable : Any?]?) {
@@ -554,6 +556,24 @@ class TapjoyReactNativeSdk: RCTEventEmitter {
      */
     @objc func trackPurchase(_ currencyCode: String, price: NSNumber) {
         Tapjoy.trackPurchase(withCurrencyCode: currencyCode, price: price.doubleValue)
+    }
+
+     // No-op methods for iOS
+    @objc func getUsageStatsConsent(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+        resolve(2)
+    }
+    
+    // No-op methods for iOS
+    @objc func setUsageStatsConsent(_ usageStatsConsent: NSNumber) {
+    }
+    
+    // No-op methods for iOS
+    @objc func optOutAdvertisingID(_ optOut: Bool) {
+    }
+    
+    // No-op methods for iOS
+    @objc func getOptOutAdvertisingID(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+        resolve(false)
     }
 }
 

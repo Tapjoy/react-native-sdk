@@ -7,16 +7,16 @@ import com.tapjoy.TJSpendCurrencyListener
 import com.tapjoy.TJAwardCurrencyListener
 import com.tapjoy.TJSetUserIDListener
 import com.tapjoy.Tapjoy
-import com.tapjoy.TJError;
-import com.tapjoy.TJPlacement;
-import com.tapjoy.TJActionRequest;
-import com.tapjoy.TJPlacementListener;
-import com.tapjoy.TJSetCurrencyBalanceListener;
-import com.tapjoy.TJSetCurrencyAmountRequiredListener;
-import com.tapjoy.TJStatus;
-import com.tapjoy.TJPrivacyPolicy;
-import com.tapjoy.TJSegment;
-import com.tapjoy.TapjoyPluginAPI;
+import com.tapjoy.TJError
+import com.tapjoy.TJPlacement
+import com.tapjoy.TJActionRequest
+import com.tapjoy.TJPlacementListener
+import com.tapjoy.TJSetCurrencyBalanceListener
+import com.tapjoy.TJSetCurrencyAmountRequiredListener
+import com.tapjoy.TJStatus
+import com.tapjoy.TJPrivacyPolicy
+import com.tapjoy.TJSegment
+import com.tapjoy.TapjoyPluginAPI
 import com.tapjoy.TJEntryPoint
 import com.tapjoy.TJLogLevel
 import java.util.Hashtable
@@ -25,7 +25,7 @@ import com.facebook.react.modules.core.DeviceEventManagerModule
 import java.lang.Exception
 
 class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
-  ReactContextBaseJavaModule(reactContext) {
+  NativeTapjoyReactNativeSdkSpec(reactContext) {
 
   val messageConnectionFailed = "connection failed"
   var placements = HashMap<String, TJPlacement>()
@@ -38,8 +38,8 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
     return NAME
   }
 
-  override fun getConstants(): Map<String, kotlin.Any> {
-    return HashMap();
+  override fun getConstants(): MutableMap<String, Any> {
+    return HashMap()
   }
 
   private var listenerCount = 0
@@ -53,13 +53,13 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
   }
 
   @ReactMethod
-  fun addListener(eventName: String) {
+  override fun addListener(eventName: String) {
     listenerCount += 1
   }
 
   @ReactMethod
-  fun removeListeners(count: Int) {
-    listenerCount -= count
+  override fun removeListeners(count: Double) {
+    listenerCount -= count.toInt()
   }
 
   /**
@@ -70,7 +70,7 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
    * @return true to javascript if it is succeeded otherwise throws error
    */
   @ReactMethod
-  fun connect(sdkKey: String, connectFlags: ReadableMap, promise: Promise) {
+  override fun connect(sdkKey: String, connectFlags: ReadableMap, promise: Promise) {
     TapjoyPluginAPI.setPlugin("ReactNative");
 
     Tapjoy.connect(this.getCurrentActivity()?.applicationContext, sdkKey, connectFlags.toHashtable(), object : TJConnectListener() {
@@ -94,7 +94,7 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
   }
 
   @ReactMethod
-  fun getCurrencyBalance(promise: Promise) {
+  override fun getCurrencyBalance(promise: Promise) {
     Tapjoy.getCurrencyBalance(object : TJGetCurrencyBalanceListener {
 
       override fun onGetCurrencyBalanceResponse(currencyName: String, balance: Int) {
@@ -112,8 +112,8 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
   }
 
   @ReactMethod
-  fun spendCurrency(amount: Int, promise: Promise) {
-    Tapjoy.spendCurrency(amount, object : TJSpendCurrencyListener {
+  override fun spendCurrency(amount: Double, promise: Promise) {
+    Tapjoy.spendCurrency(amount.toInt(), object : TJSpendCurrencyListener {
 
       override fun onSpendCurrencyResponse(currencyName: String, balance: Int) {
         val currencyObj = Arguments.createMap().apply {
@@ -130,8 +130,8 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
   }
 
   @ReactMethod
-  fun awardCurrency(amount: Int, promise: Promise) {
-    Tapjoy.awardCurrency(amount, object : TJAwardCurrencyListener {
+  override fun awardCurrency(amount: Double, promise: Promise) {
+    Tapjoy.awardCurrency(amount.toInt(), object : TJAwardCurrencyListener {
 
       override fun onAwardCurrencyResponse(currencyName: String, balance: Int) {
         val currencyObj = Arguments.createMap().apply {
@@ -153,7 +153,7 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
    * @param userId: User ID
    */
   @ReactMethod
-  fun setUserId(userId: String?, promise: Promise) {
+  override fun setUserId(userId: String?, promise: Promise) {
     Tapjoy.setUserID(userId, object: TJSetUserIDListener {
       override fun onSetUserIDSuccess() {
         promise.resolve(userId)
@@ -171,7 +171,7 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
    * @return User ID
    */
   @ReactMethod
-  fun getUserId(promise: Promise) {
+  override fun getUserId(promise: Promise) {
     promise.resolve(Tapjoy.getUserID())
   }
 
@@ -182,11 +182,12 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
    *
    */
   @ReactMethod
-  fun setUserSegment(userSegment: Int) {
-    if (userSegment == -1){
+  override fun setUserSegment(userSegment: Double) {
+    val segmentIndex = userSegment.toInt()
+    if (segmentIndex == -1){
       Tapjoy.setUserSegment(TJSegment.UNKNOWN)
     } else {
-      Tapjoy.setUserSegment(TJSegment.values()[userSegment])
+      Tapjoy.setUserSegment(TJSegment.values()[segmentIndex])
     }
   }
 
@@ -197,7 +198,7 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
    * 		      The custom parameter to assign to this device
    */
   @ReactMethod
-  fun setCustomParameter(customParameter: String) {
+  override fun setCustomParameter(customParameter: String) {
     Tapjoy.setCustomParameter(customParameter)
   }
 
@@ -206,7 +207,7 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
    * @return the value of the currently set custom parameter.
    */
   @ReactMethod
-  fun getCustomParameter(promise: Promise) {
+  override fun getCustomParameter(promise: Promise) {
     promise.resolve(Tapjoy.getCustomParameter())
   }
   /**
@@ -216,7 +217,7 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
    *
    */
   @ReactMethod
-  fun getUserSegment(promise: Promise) {
+  override fun getUserSegment(promise: Promise) {
     val segment = Tapjoy.getUserSegment()
     promise.resolve(segment?.getValue() ?: TJSegment.UNKNOWN.getValue())
   }
@@ -227,8 +228,8 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
    * @Param maxLevel: the maximum level
    */
   @ReactMethod
-  fun setMaxLevel(maxLevel: Int) {
-    Tapjoy.setMaxLevel(maxLevel);
+  override fun setMaxLevel(maxLevel: Double) {
+    Tapjoy.setMaxLevel(maxLevel.toInt());
   }
 
   /** 
@@ -237,7 +238,7 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
    * @return the maximum level
    */
   @ReactMethod
-  fun getMaxLevel(promise: Promise) {
+  override fun getMaxLevel(promise: Promise) {
     promise.resolve(Tapjoy.getMaxLevel())
   }
 
@@ -248,8 +249,8 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
    *            the level of the user
    */
   @ReactMethod
-  fun setUserLevel(userLevel: Int) {
-    Tapjoy.setUserLevel(userLevel)
+  override fun setUserLevel(userLevel: Double) {
+    Tapjoy.setUserLevel(userLevel.toInt())
   }
 
   /**
@@ -258,7 +259,7 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
    * @return the level of the user.
    */
   @ReactMethod
-  fun getUserLevel(promise: Promise) {
+  override fun getUserLevel(promise: Promise) {
     promise.resolve(Tapjoy.getUserLevel())
   }
 
@@ -268,7 +269,7 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
    * @return list of user tags
    */
   @ReactMethod
-  fun getUserTags(promise: Promise) {
+  override fun getUserTags(promise: Promise) {
     val tags = Tapjoy.getUserTags()
     val tagsArray: WritableArray = Arguments.createArray()
 
@@ -285,7 +286,7 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
    *        the tags to be set
    */
   @ReactMethod
-  fun setUserTags(tags: ReadableArray)  {
+  override fun setUserTags(tags: ReadableArray)  {
      val tagsSet: Set<String> = (0 until tags.size())
         .mapNotNull { tags.getString(it) }
         .toSet()
@@ -296,7 +297,7 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
    * Removes all tags from the user.
    */
   @ReactMethod
-  fun clearUserTags() {
+  override fun clearUserTags() {
     Tapjoy.clearUserTags()
   }
 
@@ -307,7 +308,7 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
    *        the tag to be added
    */
   @ReactMethod
-  fun addUserTag(tag: String) {
+  override fun addUserTag(tag: String) {
     Tapjoy.addUserTag(tag)
   }
 
@@ -317,14 +318,14 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
    * @param tag
    *        the tag to be removed
    */
-	@ReactMethod
-  fun removeUserTag(tag: String) {
+  @ReactMethod
+  override fun removeUserTag(tag: String) {
     Tapjoy.removeUserTag(tag)
   }
 
   @ReactMethod
-  fun setLoggingLevel(level: Int) {
-    when (level) {
+  override fun setLoggingLevel(level: Double) {
+    when (level.toInt()) {
       0 -> Tapjoy.setLoggingLevel(TJLogLevel.ERROR)
       1 -> Tapjoy.setLoggingLevel(TJLogLevel.WARNING)
       2 -> Tapjoy.setLoggingLevel(TJLogLevel.INFO)
@@ -333,7 +334,7 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
   }
 
   @ReactMethod
-  fun getLoggingLevel(promise: Promise) {
+  override fun getLoggingLevel(promise: Promise) {
     when (Tapjoy.getLoggingLevel()) {
       TJLogLevel.ERROR -> promise.resolve(0)
       TJLogLevel.WARNING -> promise.resolve(1)
@@ -348,7 +349,7 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
   }
 
   @ReactMethod(isBlockingSynchronousMethod = true)
-  fun isConnected(): Boolean {
+  override fun isConnected(): Boolean {
     return Tapjoy.isConnected()
   }
 
@@ -358,7 +359,7 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
    * @param placementName Case-sensitive placement name string. Must not be empty or null.
    */
   @ReactMethod
-  fun createPlacement(placementName: String) {
+  override fun createPlacement(placementName: String) {
     val listener = object : TJPlacementListener {
       override fun onRequestSuccess(placement: TJPlacement) {
         val parameters = Arguments.createMap().apply {
@@ -417,7 +418,7 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
    * @param placementName Case-sensitive placement name string. Must not be empty or null.
    */
   @ReactMethod
-  fun requestPlacement(placementName: String) {
+  override fun requestPlacement(placementName: String) {
     val placement = placements[placementName]
     placement?.requestContent()
   }
@@ -428,7 +429,7 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
    * @param placementName Case-sensitive placement name string. Must not be empty or null.
    */
   @ReactMethod
-  fun showPlacement(placementName: String) {
+  override fun showPlacement(placementName: String) {
     placements[placementName]?.showContent()
   }
 
@@ -440,7 +441,7 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
    * @return true if content has been cached and ready to show.
    */
   @ReactMethod(isBlockingSynchronousMethod = true)
-  fun isContentReady(placementName: String): Boolean {
+  override fun isContentReady(placementName: String): Boolean {
     return placements[placementName]?.isContentReady ?: false
   }
 
@@ -452,7 +453,7 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
    * @return true if content is available to cache or stream.
    */
   @ReactMethod(isBlockingSynchronousMethod = true)
-  fun isContentAvailable(placementName: String): Boolean {
+  override fun isContentAvailable(placementName: String): Boolean {
     return placements[placementName]?.isContentAvailable ?: false
   }
 
@@ -465,8 +466,8 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
    * @param {Promise} promise - The promise to fulfill after setting the balance.
    */
   @ReactMethod
-  fun setCurrencyBalance(currencyAmount: Int, currencyId: String, placementName: String, promise: Promise) {
-    placements[placementName]?.setCurrencyBalance(currencyId, currencyAmount, object : TJSetCurrencyBalanceListener {
+  override fun setCurrencyBalance(currencyAmount: Double, currencyId: String, placementName: String, promise: Promise) {
+    placements[placementName]?.setCurrencyBalance(currencyId, currencyAmount.toInt(), object : TJSetCurrencyBalanceListener {
       override fun onSetCurrencyBalanceSuccess() {
         promise.resolve(true)
       }
@@ -485,7 +486,7 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
    * @return {Promise} amount - The promise to fulfill after getting the balance.
    */
   @ReactMethod
-  fun getPlacementCurrencyBalance(currencyId: String, placementName: String, promise: Promise) {
+  override fun getPlacementCurrencyBalance(currencyId: String, placementName: String, promise: Promise) {
     promise.resolve(placements[placementName]?.getCurrencyBalance(currencyId))
   }
 
@@ -498,13 +499,13 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
    * @return The promise to fulfill after getting the balance.
    */
   @ReactMethod
-  fun setRequiredAmount(currencyAmount: Int, currencyId: String, placementName: String,  promise: Promise) {
+  override fun setRequiredAmount(currencyAmount: Double, currencyId: String, placementName: String,  promise: Promise) {
     val placement = placements[placementName]
     if (placement == null) {
       promise.reject("Placement not found", "Placement does not exist.", Exception("Placement not found"))
       return
     }
-    placement?.setCurrencyAmountRequired(currencyId, currencyAmount, object : TJSetCurrencyAmountRequiredListener {
+    placement.setCurrencyAmountRequired(currencyId, currencyAmount.toInt(), object : TJSetCurrencyAmountRequiredListener {
       override fun onSetCurrencyAmountRequiredSuccess() {
         promise.resolve(true)
       }
@@ -522,7 +523,7 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
    * @return The amount of the required currency, -1 if not available.
    */
   @ReactMethod
-  fun getRequiredAmount(currencyId: String, placementName: String,  promise: Promise) {
+  override fun getRequiredAmount(currencyId: String, placementName: String,  promise: Promise) {
     val placement = placements[placementName]
     if (placement == null) {
       promise.resolve(-1)
@@ -538,8 +539,8 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
    * @see TJEntryPoint
    */
   @ReactMethod
-  fun setEntryPoint(placementName: String, entryPoint: Int) {
-    placements[placementName]?.setEntryPoint(TJEntryPoint.fromOrdinal(entryPoint))
+  override fun setEntryPoint(placementName: String, entryPoint: Double) {
+    placements[placementName]?.setEntryPoint(TJEntryPoint.fromOrdinal(entryPoint.toInt()))
   }
 
   /**
@@ -549,7 +550,7 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
    * @see TJEntryPoint
    */
   @ReactMethod
-  fun getEntryPoint(placementName: String, promise: Promise) {
+  override fun getEntryPoint(placementName: String, promise: Promise) {
     promise.resolve(placements[placementName]?.getEntryPoint()?.ordinal)
   }
 
@@ -563,7 +564,7 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
    *            the price of product
    */
   @ReactMethod
-  fun trackPurchase(currencyCode: String, price: Double) {
+  override fun trackPurchase(currencyCode: String, price: Double) {
     Tapjoy.trackPurchase(currencyCode, price)
   }
 
@@ -573,8 +574,8 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
    * @param gdprApplicable true (1) if GDPR applies to this user, false (0) otherwise
    */
   @ReactMethod
-  fun setSubjectToGDPRStatus(gdprApplicableStatus: Int) {
-    val status = TJStatus.values()[gdprApplicableStatus]
+  override fun setSubjectToGDPRStatus(gdprApplicableStatus: Double) {
+    val status = TJStatus.values()[gdprApplicableStatus.toInt()]
     Tapjoy.getPrivacyPolicy().setSubjectToGDPR(status)
   }
 
@@ -584,7 +585,7 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
    * @return TJStatus.TRUE (1) if below consent age (COPPA) applies to this user, TJStatus.FALSE (0) otherwise
    */
   @ReactMethod
-  fun getBelowConsentAge(promise: Promise) {
+  override fun getBelowConsentAge(promise: Promise) {
     val getPrivacyPolicy = Tapjoy.getPrivacyPolicy()
     if (getPrivacyPolicy == null) {
         promise.reject("Get Below Consent Age Error", Exception("error"))
@@ -602,7 +603,7 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
    * @return TJStatus.TRUE (1) if GDPR applies to this user, TJStatus.FALSE (0) otherwise
    */
   @ReactMethod
-  fun getSubjectToGDPR(promise: Promise) {
+  override fun getSubjectToGDPR(promise: Promise) {
     val getPrivacyPolicy = Tapjoy.getPrivacyPolicy()
     if (getPrivacyPolicy == null) {
         promise.reject("Get Subject To GDPR Error", Exception("error"))
@@ -619,7 +620,7 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
    * @return The user consent value
    */
   @ReactMethod
-  fun getUserConsent(promise: Promise) {
+  override fun getUserConsent(promise: Promise) {
     val getPrivacyPolicy = Tapjoy.getPrivacyPolicy()
     if (getPrivacyPolicy == null) {
         promise.reject("Get User Consent Error", Exception("error"))
@@ -635,7 +636,7 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
    * @return The us privacy value string
    */
   @ReactMethod
-  fun getUSPrivacy(promise: Promise) {
+  override fun getUSPrivacy(promise: Promise) {
     val privacyPolicy = Tapjoy.getPrivacyPolicy()
     if (privacyPolicy != null) {
       promise.resolve(privacyPolicy.getUSPrivacy() ?: "")
@@ -650,8 +651,8 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
    * @param isBelowConsentAge true (1) if below consent age (COPPA) applies to this user, false (0) otherwise
    */
   @ReactMethod
-  fun setBelowConsentAgeStatus(isBelowConsentAgeStatus: Int) {
-    val status = TJStatus.values()[isBelowConsentAgeStatus]
+  override fun setBelowConsentAgeStatus(isBelowConsentAgeStatus: Double) {
+    val status = TJStatus.values()[isBelowConsentAgeStatus.toInt()]
     Tapjoy.getPrivacyPolicy().setBelowConsentAge(status)
   }
   /**
@@ -660,7 +661,7 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
    * @param privacyValue The privacy value string eg. "1YNN" where 1 is char in string for the version, Y = YES, N = No, - = Not Applicable
    */
   @ReactMethod
-  fun setUSPrivacy(isUsPrivacy: String){
+  override fun setUSPrivacy(isUsPrivacy: String){
     Tapjoy.getPrivacyPolicy().setUSPrivacy(isUsPrivacy)
   }
 
@@ -670,18 +671,55 @@ class TapjoyReactNativeSdkModule(reactContext: ReactApplicationContext) :
    * @param userConsent The value can be "0" (User has not provided consent), "1" (User has provided consent) or a daisybit string as suggested in IAB's Transparency and Consent Framework
    */
   @ReactMethod
-  fun setUserConsentStatus(userConsentStatus: Int) {
-    val status = TJStatus.values()[userConsentStatus]
+  override fun setUserConsentStatus(userConsentStatus: Double) {
+    val status = TJStatus.values()[userConsentStatus.toInt()]
     Tapjoy.getPrivacyPolicy().setUserConsent(status)
+  }
+  /**
+    * <strong>WARNING: EXPERIMENTAL API - DO NOT USE IT</strong>
+    * <p>
+    * This method is experimental and intended for internal purposes only.
+    * <p>
+    * Returns the user's consent status for accessing Android's Usage Stats API.
+    *
+    * @return TJStatus.TRUE if the user agrees, TJStatus.FALSE otherwise
+    */
+  @ReactMethod
+  override fun getUsageStatsConsent(promise: Promise) {
+    val privacyPolicy = Tapjoy.getPrivacyPolicy()
+    if (privacyPolicy != null) {
+      promise.resolve(privacyPolicy.getUsageStatsConsent()?.getValue() ?: TJStatus.UNKNOWN.getValue())
+    } else {
+      promise.reject("Get Usage Stats Consent Error", Exception("error"))
+    }
+  }
+
+  /**
+    * <strong>WARNING: EXPERIMENTAL API - DO NOT USE IT</strong>
+    * <p>
+    * This method is experimental and intended for internal purposes only.
+    * <p>
+    * Sets the user's consent status for accessing Android's Usage Stats API.
+    * The Android Usage Stats API (UsageStatsManager) allows apps to access
+    * data about app usage on the device.
+    *
+    * @param usageStatsConsent TJStatus.TRUE if the user has granted permission
+    * to access their usage statistics, TJStatus.FALSE
+    * if they have denied or not yet granted permission.
+    */
+  @ReactMethod
+  override fun setUsageStatsConsent(usageStatsConsent: Double) {
+    val status = TJStatus.values()[usageStatsConsent.toInt()]
+    Tapjoy.getPrivacyPolicy().setUsageStatsConsent(status)
   }
 
   @ReactMethod
-  fun optOutAdvertisingID(optOut: Boolean) {
+  override fun optOutAdvertisingID(optOut: Boolean) {
     Tapjoy.optOutAdvertisingID(this.getCurrentActivity()?.applicationContext, optOut)
   }
 
   @ReactMethod
-  fun getOptOutAdvertisingID(promise: Promise) {
+  override fun getOptOutAdvertisingID(promise: Promise) {
     val optOutStatus = Tapjoy.getOptOutAdvertisingID(this.getCurrentActivity()?.applicationContext)
     if (optOutStatus != null) {
       promise.resolve(optOutStatus)
